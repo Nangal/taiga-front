@@ -171,9 +171,11 @@ module.service("lightboxKeyboardNavigationService", LightboxKeyboardNavigationSe
 
 LightboxDirective = (lightboxService) ->
     link = ($scope, $el, $attrs) ->
-        $el.on "click", ".close", (event) ->
-            event.preventDefault()
-            lightboxService.close($el)
+
+        if !$attrs.$attr.visible
+            $el.on "click", ".close", (event) ->
+                event.preventDefault()
+                lightboxService.close($el)
 
     return {restrict: "C", link: link}
 

@@ -1,0 +1,65 @@
+.import-project-members
+    div(ng-include="'projects/create/import/import-header.html'")
+
+    h2.import-project-members-title(translate="PROJECT.IMPORT.PROJECT_MEMBERS")
+    p(translate="PROJECT.IMPORT.PROCESS_DESCRIPTION", translate-values="{platform: vm.platform}")
+
+    .spin(tg-loading="!!!vm.members.size")
+
+    .import-project-members-system(ng-if="vm.members.size")
+        .import-project-members-logo
+            img(ng-src="{{vm.logo}}")
+        .import-project-members-logo
+            img(
+                src="/#{v}/images/logo-color.png"
+                alt="Taiga Logo"
+            )
+
+    ul(ng-if="vm.members.size")
+        li.import-project-members-row(tg-repeat="member in vm.members track by member.get('id')")
+            .import-project-members-single
+                .avatar.empty {{member.get('full_name')[0].toUpperCase()}}
+                span.import-project-members-username {{member.get('full_name')}}
+
+            .import-project-members-actions
+                .import-project-members-match(ng-if="vm.showSuggestedMatch(member)")
+                    span(
+                        translate="PROJECT.IMPORT.MATCH"
+                        translate-values="{user_external:member.get('full_name'), user_internal: member.getIn(['user', 'full_name'])}"
+                    )
+                    button.import-project-members-match-true(ng-click="vm.confirmUser(member, member.get('user'))")
+                        tg-svg(svg-icon="icon-check-empty")
+                    button.import-project-members-match-false(ng-click="vm.discardSuggestedUser(member)")
+                        tg-svg(svg-icon="icon-close")
+
+                .import-project-members-selected(ng-if="vm.getUser(member) && !vm.showSuggestedMatch(member)")
+                    button.import-project-members-delete(ng-click="vm.cleanMember(member)")
+                        tg-svg(svg-icon="icon-close")
+                    span {{vm.getUser(member).get('full_name')}}
+                    span.import-project-members-selected-img
+                        img(tg-avatar="vm.getUser(member)")
+
+                button.button.button-trans.import-project-members-choose.ng-animate-disabled(
+                    ng-if="!vm.getUser(member) && !vm.showSuggestedMatch(member)"
+                    ng-click="vm.searchUser(member)"
+                    translate="PROJECT.IMPORT.CHOOSE"
+                )
+
+    button.button.button-green.import-project-members-submit(
+        ng-if="vm.members.size > 0"
+        ng-click="vm.beforeSubmitUsers()"
+        translate="PROJECT.IMPORT.IMPORT"
+    )
+
+    tg-select-import-user-lightbox.lightbox(
+       visible="vm.selectImportUserLightbox"
+       on-close="vm.selectImportUserLightbox = false"
+       user="vm.searchingUser"
+       on-select-user="vm.confirmUser(user, taigaUser)"
+    )
+
+    tg-warning-user-import-lightbox.lightbox(
+        visible="vm.warningImportUsers"
+        on-confirm="vm.submit()"
+        on-close="vm.warningImportUsers = false"
+    )

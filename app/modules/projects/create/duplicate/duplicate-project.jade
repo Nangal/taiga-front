@@ -1,0 +1,53 @@
+.create-project
+    h1.create-project-title(translate="PROJECT.DUPLICATE.TITLE")
+    h3.create-project-description(translate="PROJECT.DUPLICATE.DESCRIPTION")
+    form.duplicate-project.e2e-duplicate-project(ng-submit="vm.submit()")
+        fieldset.duplicate-project-reference.e2e-duplicate-project-reference
+            select(
+                ng-model="vm.projectForm.project"
+                ng-change="vm.getReferenceProject(vm.projectForm.project)"
+                data-required="true"
+                ng-options="p.slug as p.name for p in vm.projects | toMutable"
+                id="project-selector-dropdown"
+                autofocus
+            )
+                option(
+                    value=""
+                    disabled
+                    selected
+                    translate="PROJECT.DUPLICATE.SELECT_PLACEHOLDER"
+                )
+
+        div(ng-include="'projects/create/import-project-form-common/name.html'")
+        div(ng-include="'projects/create/import-project-form-common/description.html'")
+        div(ng-include="'projects/create/import-project-form-common/project-privacy.html'")
+
+        label(ng-if="vm.invitedMembers")
+            span(translate="PROJECT.CREATE.INVITE")
+            span.mumble(
+                ng-if="vm.displayUserWarning"
+                translate="PROJECT.CREATE.SOLO_PROJECT"
+            )
+            span.mumble(translate="PROJECT.CREATE.INVITE_LATER")
+
+        tg-invite-members(
+            ng-if="vm.invitedMembers"
+            members="vm.invitedMembers"
+            on-set-invited-members="vm.setInvitedMembers(members)"
+        )
+
+        p.create-project-limit(
+            ng-if="vm.projectForm.is_private && vm.limitMembersPrivateProject"
+            translate="PROJECT.CREATE.MAX_MEMBERS"
+        )
+        p.create-project-limit(
+            ng-if="!vm.projectForm.is_private && vm.limitMembersPublicProject"
+            translate="PROJECT.CREATE.MAX_MEMBERS"
+        )
+
+        tg-create-project-restrictions(
+            can-create-public-projects="vm.canCreatePublicProjects"
+            can-create-private-projects="vm.canCreatePrivateProjects"
+        )
+
+        div(ng-include="'projects/create/import-project-form-common/actions.html'")
