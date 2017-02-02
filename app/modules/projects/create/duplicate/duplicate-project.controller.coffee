@@ -26,13 +26,12 @@ class DuplicateProjectController
     ]
 
     constructor: (@currentUserService, @projectsService, @location, @navUrls) ->
-        allProjects = @currentUserService.projects.get("all")
-        @.projects = allProjects.filter (project) =>
-            !project.get('blocked_code')
         @.user = @currentUserService.getUser()
 
         @.canCreatePublicProjects = @currentUserService.canCreatePublicProjects()
         @.canCreatePrivateProjects = @currentUserService.canCreatePrivateProjects()
+
+        taiga.defineImmutableProperty @, 'projects', () => @currentUserService.projects.get("all")
 
         @.projectForm = {
             is_private: false

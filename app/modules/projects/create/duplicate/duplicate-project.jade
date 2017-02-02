@@ -7,7 +7,7 @@
                 ng-model="vm.projectForm.project"
                 ng-change="vm.getReferenceProject(vm.projectForm.project)"
                 data-required="true"
-                ng-options="p.slug as p.name for p in vm.projects | toMutable"
+                ng-options="p.slug as p.name for p in vm.projects | toMutable| filter:{blocked_code: '!'}"
                 id="project-selector-dropdown"
                 autofocus
             )
