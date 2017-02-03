@@ -4,7 +4,7 @@
         h3.create-project-description(translate="PROJECT.CREATE.CHOOSE_TEMPLATE")
         ul.create-project-selector.e2e-create-project-selector
             li
-                a(
+                a.e2e-create-project-scrum(
                     title="{{'PROJECT.CREATE.TEMPLATE_SCRUM' | translate}}",
                     tg-nav="create-project-scrum"
                     href=""
@@ -22,7 +22,7 @@
                         .create-project-selector-long-description(ng-show="vm.displayScrumDesc")
                             p(translate="PROJECT.CREATE.TEMPLATE_SCRUM_LONGDESC")
             li
-                a(
+                a.e2e-create-project-kanban(
                     tg-nav="create-project-kanban"
                     title="{{'PROJECT.CREATE.TEMPLATE_KANBAN' | translate}}",
                     href=""
@@ -40,8 +40,8 @@
                             )
                         .create-project-selector-long-description(ng-show="vm.displayKanbanDesc")
                             p(translate="PROJECT.CREATE.TEMPLATE_KANBAN_LONGDESC")
-            li.e2e-duplicate-project
-                a(
+            li
+                a.e2e-duplicate-project(
                     tg-nav="create-project-duplicate"
                     title="{{'PROJECT.CREATE.DUPLICATE' | translate}}",
                     href=""
