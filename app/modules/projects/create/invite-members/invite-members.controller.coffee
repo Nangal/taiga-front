@@ -20,24 +20,7 @@
 class InviteMembersController
     @.$inject = []
 
-    constructor: () ->
-        @.invitedMembers = @.members
-        @.displayUserWarning = false
-
-    toggleInviteMember: (member) ->
-        membersList = @.invitedMembers.map (members) =>
-            members.get('id')
-
-        if membersList.includes(member.get('id'))
-            @.invitedMembers = @.invitedMembers.filter (members) =>
-                members.get('id') != member.get('id')
-        else
-            @.invitedMembers = @.invitedMembers.push(member)
-
-        @.displayUserWarning = false
-        if @.invitedMembers.size == 0
-            @.displayUserWarning = true
-
-        @.onSetInvitedMembers({members: @.invitedMembers})
+    isDisabled: (id) ->
+        return @.invitedMembers.indexOf(id) == -1
 
 angular.module("taigaProjects").controller("InviteMembersCtrl", InviteMembersController)

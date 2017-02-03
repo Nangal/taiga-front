@@ -5,7 +5,7 @@
         fieldset.duplicate-project-reference.e2e-duplicate-project-reference
             select(
                 ng-model="vm.projectForm.project"
-                ng-change="vm.getReferenceProject(vm.projectForm.project)"
+                ng-change="vm.refreshReferenceProject(vm.projectForm.project)"
                 data-required="true"
                 ng-options="p.slug as p.name for p in vm.projects | toMutable| filter:{blocked_code: '!'}"
                 id="project-selector-dropdown"
@@ -31,9 +31,10 @@
             span.mumble(translate="PROJECT.CREATE.INVITE_LATER")
 
         tg-invite-members(
-            ng-if="vm.invitedMembers"
-            members="vm.invitedMembers"
-            on-set-invited-members="vm.setInvitedMembers(members)"
+            ng-if="vm.members.size"
+            members="vm.members"
+            invited-members="vm.invitedMembers"
+            on-toggle-invited-member="vm.toggleInvitedMember(member)"
         )
 
         p.create-project-limit(

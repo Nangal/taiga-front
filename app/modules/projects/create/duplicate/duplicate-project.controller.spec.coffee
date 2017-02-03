@@ -90,8 +90,23 @@ describe "DuplicateProjectController", ->
         ctrl.canCreatePrivateProjects = mocks.currentUserService.canCreatePublicProjects()
         ctrl.projectForm = {}
 
-    it "get project to duplicate", () ->
+    it "toggle invited Member", () ->
+        ctrl = controller "DuplicateProjectCtrl"
 
+        ctrl.invitedMembers = Immutable.List([1, 2, 3])
+        ctrl.checkUsersLimit = sinon.spy()
+
+        ctrl.toggleInvitedMember(2)
+
+        expect(ctrl.invitedMembers.toJS()).to.be.eql([1, 3])
+
+        ctrl.toggleInvitedMember(5)
+
+        expect(ctrl.invitedMembers.toJS()).to.be.eql([1, 3, 5])
+
+        expect(ctrl.checkUsersLimit).to.have.been.called
+
+    it "get project to duplicate", () ->
         project = Immutable.fromJS({
             members: [
                 {id: 1},
@@ -105,48 +120,10 @@ describe "DuplicateProjectController", ->
 
         promise = mocks.projectsService.getProjectBySlug.withArgs(slug).promise().resolve(project)
 
-        ctrl.getReferenceProject(slug).then () ->
+        ctrl.refreshReferenceProject(slug).then () ->
             expect(ctrl.referenceProject).to.be.equal(project)
-            expect(ctrl.invitedMembers).to.be.equal(project.get('members'))
-            expect(ctrl._getInvitedMembers).to.be.calledWith(ctrl.invitedMembers)
-
-    it 'get Invited members', () ->
-        membersBefore = Immutable.fromJS([
-            {id: 1},
-            {id: 2},
-            {id: 3}
-        ])
-        ctrl.user = Immutable.fromJS(
-            id: 1
-        )
-        membersAfter = Immutable.fromJS([
-            {id: 2},
-            {id: 3}
-        ])
-
-        ctrl.setInvitedMembers = sinon.spy()
-        ctrl.checkUsersLimit = sinon.spy()
-        ctrl.invitedMembers = membersBefore
-
-        ctrl._getInvitedMembers(ctrl.invitedMembers)
-        expect(ctrl.invitedMembers.toJS()).to.be.eql(membersAfter.toJS())
-        expect(ctrl.setInvitedMembers).to.be.calledWith(ctrl.invitedMembers)
-        expect(ctrl.checkUsersLimit).to.be.calledWith(ctrl.invitedMembers)
-
-    it 'set Invited members', () ->
-        ctrl.projectForm = {}
-        members = Immutable.fromJS([
-            {id: 1},
-            {id: 2},
-            {id: 3}
-        ])
-        membersList = Immutable.fromJS([1, 2, 3])
-
-        ctrl.checkUsersLimit = sinon.spy()
-
-        ctrl.setInvitedMembers(members)
-        expect(ctrl.projectForm.users).to.be.eql(membersList)
-        expect(ctrl.checkUsersLimit).to.be.calledWith(members)
+            expect(ctrl.members).to.be.equal(project.get('members'))
+            expect(ctrl.invitedMembers.toJS()).to.be.eql([1, 2, 3])
 
     it 'user can invite more members in private project', () ->
         members = Immutable.fromJS([

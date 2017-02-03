@@ -19,14 +19,17 @@
 
 SelectImportUserLightboxDirective = (lightboxService, lightboxKeyboardNavigationService) ->
     link = (scope, el, attrs, ctrl) ->
+        pepe = () ->
         scope.$watch 'vm.visible', (visible) ->
             if visible && !el.hasClass('open')
                 ctrl.start()
-                lightboxService.open(el, scope.vm.onClose).then ->
+                lightboxService.open(el, null, scope.vm.onClose).then ->
                     el.find('input').focus()
                     lightboxKeyboardNavigationService.init(el)
             else if !visible && el.hasClass('open')
-                lightboxService.close(el)
+                lightboxService.close(el).then () ->
+                    ctrl.userEmail = ''
+                    ctrl.usersSearch = ''
 
     return {
         controller: "SelectImportUserLightboxCtrl",

@@ -18,14 +18,10 @@
 ###
 
 SingleMemberDirective = () ->
-
-    link = (scope, el, attr, ctrl) ->
-        scope.isUserDisabled = false
-
     return {
-        link: link,
         templateUrl:"projects/create/invite-members/single-member/single-member.html",
         scope: {
+            disabled: "<",
             avatar: "="
         }
     }

@@ -27,8 +27,9 @@ InviteMembersDirective = () ->
         controllerAs: "vm",
         bindToController: true,
         scope: {
+            invitedMembers: '<',
             members: '<',
-            onSetInvitedMembers: '&'
+            onToggleInvitedMember: '&'
         }
     }
 

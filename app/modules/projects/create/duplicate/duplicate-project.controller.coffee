@@ -27,6 +27,7 @@ class DuplicateProjectController
 
     constructor: (@currentUserService, @projectsService, @location, @navUrls) ->
         @.user = @currentUserService.getUser()
+        @.members = Immutable.List()
 
         @.canCreatePublicProjects = @currentUserService.canCreatePublicProjects()
         @.canCreatePrivateProjects = @currentUserService.canCreatePrivateProjects()
@@ -37,23 +38,19 @@ class DuplicateProjectController
             is_private: false
         }
 
-    getReferenceProject: (slug) ->
+    refreshReferenceProject: (slug) ->
         @projectsService.getProjectBySlug(slug).then (project) =>
             @.referenceProject = project
-            @.invitedMembers = project.get('members')
-            @._getInvitedMembers(@.invitedMembers)
+            @.members = project.get('members')
+            @.invitedMembers = @.members.map (it) -> return it.get('id')
 
-    _getInvitedMembers: (members) ->
-        @.invitedMembers = members
-        @.invitedMembers = @.invitedMembers.filter (members) =>
-            members.get('id') != @.user.get('id')
-        @.setInvitedMembers(@.invitedMembers)
+    toggleInvitedMember: (member) ->
+        if @.invitedMembers.includes(member)
+            @.invitedMembers = @.invitedMembers.filter (it) -> it != member
+        else
+            @.invitedMembers = @.invitedMembers.push(member)
+
         @.checkUsersLimit(@.invitedMembers)
-
-    setInvitedMembers: (members) ->
-        @.projectForm.users = members.map (member) =>
-            member.get('id')
-        @.checkUsersLimit(members)
 
     checkUsersLimit: (members) ->
         size = members.size

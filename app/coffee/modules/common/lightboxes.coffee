@@ -38,7 +38,7 @@ trim = @.taiga.trim
 class LightboxService extends taiga.Service
     constructor: (@animationFrame, @q, @rootScope) ->
 
-    open: ($el, onClose) ->
+    open: ($el, onClose, onEsc) ->
         @.onClose = onClose
 
         if _.isString($el)
@@ -68,7 +68,12 @@ class LightboxService extends taiga.Service
         docEl = angular.element(document)
         docEl.on "keydown.lightbox", (e) =>
             code = if e.keyCode then e.keyCode else e.which
-            @.close($el) if code == 27
+            if code == 27
+                if onEsc
+                    @rootScope.$applyAsync(onEsc)
+                else
+                    @.close($el)
+
 
         return defered.promise
 
