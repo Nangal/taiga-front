@@ -9,7 +9,6 @@
             ng-value="false"
             ng-model="vm.projectForm.is_private"
             required
-            ng-disabled="!vm.canCreatePublicProjects"
             ng-checked="vm.canCreatePublicProjects"
         )
         label(for="template-public")
@@ -25,8 +24,6 @@
             ng-model="vm.projectForm.is_private"
             aria-hidden="true"
             required
-            ng-disabled="!vm.canCreatePrivateProjects"
-            ng-checked="!vm.canCreatePublicProjects"
         )
         label(for="template-private")
             tg-svg(svg-icon="icon-lock")

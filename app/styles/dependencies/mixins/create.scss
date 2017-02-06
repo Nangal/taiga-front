@@ -7,7 +7,6 @@
     }
 
     label {
-        @include font-type(bold);
         @include font-size(small);
         display: block;
         margin-bottom: 0.25rem;
@@ -19,6 +18,7 @@
     }
 
     &-check {
+        @include font-type(bold);
         position: relative;
 
         span {

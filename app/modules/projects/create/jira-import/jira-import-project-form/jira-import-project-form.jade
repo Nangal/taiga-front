@@ -1,7 +1,10 @@
 .import-project-jira-form
     div(ng-include="'projects/create/import/import-header.html'")
 
-    form(ng-submit="vm.saveForm()")
+    form(
+        name="projectForm",
+        ng-submit="vm.saveForm()"
+    )
         div(ng-include="'projects/create/import-project-form-common/name.html'")
         div(ng-include="'projects/create/import-project-form-common/description.html'")
 
@@ -106,5 +109,10 @@
                     span.control-indicator(translate="PROJECT.IMPORT.JIRA.NOT_CREATE_NEW_ISSUES")
 
         div(ng-include="'projects/create/import-project-form-common/project-privacy.html'")
+        tg-create-project-restrictions(
+            is-private="vm.projectForm.is_private"
+            can-create-public-projects="vm.canCreatePublicProjects"
+            can-create-private-projects="vm.canCreatePrivateProjects"
+        )
         div(ng-include="'projects/create/import-project-form-common/links.html'")
         div(ng-include="'projects/create/import-project-form-common/actions.html'")

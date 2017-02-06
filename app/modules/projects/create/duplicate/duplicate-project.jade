@@ -1,7 +1,10 @@
 .create-project
     h1.create-project-title(translate="PROJECT.DUPLICATE.TITLE")
     h3.create-project-description(translate="PROJECT.DUPLICATE.DESCRIPTION")
-    form.duplicate-project.e2e-duplicate-project(ng-submit="vm.submit()")
+    form.duplicate-project.e2e-duplicate-project(
+        name="projectForm"
+        ng-submit="vm.submit()"
+    )
         fieldset.duplicate-project-reference.e2e-duplicate-project-reference
             select(
                 ng-model="vm.projectForm.project"
@@ -20,7 +23,14 @@
 
         div(ng-include="'projects/create/import-project-form-common/name.html'")
         div(ng-include="'projects/create/import-project-form-common/description.html'")
+
         div(ng-include="'projects/create/import-project-form-common/project-privacy.html'")
+        tg-create-project-restrictions(
+            is-private="vm.projectForm.is_private"
+            can-create-public-projects="vm.canCreatePublicProjects"
+            can-create-private-projects="vm.canCreatePrivateProjects"
+        )
+
 
         label(ng-if="vm.invitedMembers")
             span(translate="PROJECT.CREATE.INVITE")
@@ -37,18 +47,18 @@
             on-toggle-invited-member="vm.toggleInvitedMember(member)"
         )
 
-        p.create-project-limit(
-            ng-if="vm.projectForm.is_private && vm.limitMembersPrivateProject"
-            translate="PROJECT.CREATE.MAX_MEMBERS"
-        )
-        p.create-project-limit(
-            ng-if="!vm.projectForm.is_private && vm.limitMembersPublicProject"
-            translate="PROJECT.CREATE.MAX_MEMBERS"
-        )
+        div.create-project-warning(ng-if="vm.projectForm.is_private && vm.limitMembersPrivateProject")
+            tg-svg(svg-icon="icon-exclamation")
+            span(
+                translate="PROJECT.CREATE.MAX_MEMBERS"
+                translate-values="{max_memberships: vm.user.get('max_memberships_private_projects')}"
+            )
 
-        tg-create-project-restrictions(
-            can-create-public-projects="vm.canCreatePublicProjects"
-            can-create-private-projects="vm.canCreatePrivateProjects"
-        )
+        div.create-project-warning(ng-if="!vm.projectForm.is_private && vm.limitMembersPublicProject")
+            tg-svg(svg-icon="icon-exclamation")
+            span(
+                translate="PROJECT.CREATE.MAX_MEMBERS"
+                translate-values="{max_memberships: vm.user.get('max_memberships_public_projects')}"
+            )
 
         div(ng-include="'projects/create/import-project-form-common/actions.html'")

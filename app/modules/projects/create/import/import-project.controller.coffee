@@ -74,7 +74,6 @@ class ImportProjectController
                 @jiraService.setToken(locationSearch.token, locationSearch.url)
 
     select: (from) ->
-        console.log from
         if from == "trello"
             @trelloService.getAuthUrl().then (url) =>
                 @window.open(url, "_self")

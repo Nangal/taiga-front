@@ -33,10 +33,19 @@ class AsanaImportProjectFormController
         @.projectForm.keepExternalReference = false
         @.projectForm.project_type = "scrum"
 
+        if !@.canCreateProject()
+            @.projectForm.is_private = true
+
     saveForm: () ->
         @.onSaveProjectDetails({project: Immutable.fromJS(@.projectForm)})
 
+    canCreateProject: () ->
+        if @.projectForm.is_private
+            return @.canCreatePrivateProjects.valid
+        else
+            return @.canCreatePublicProjects.valid
+
     isDisabled: () ->
-        return !@.projectForm.name || !@.projectForm.description || @.loading
+        return !@.canCreateProject()
 
 angular.module('taigaProjects').controller('AsanaImportProjectFormCtrl', AsanaImportProjectFormController)

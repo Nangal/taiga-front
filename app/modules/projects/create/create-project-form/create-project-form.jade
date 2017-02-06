@@ -15,12 +15,16 @@
         translate="PROJECT.CREATE.TEMPLATE_KANBAN_DESC"
     )
 
-    form(ng-submit="vm.submit()")
+    form(
+        name="projectForm",
+        ng-submit="vm.submit()"
+    )
         div(ng-include="'projects/create/import-project-form-common/name.html'")
         div(ng-include="'projects/create/import-project-form-common/description.html'")
         div(ng-include="'projects/create/import-project-form-common/project-privacy.html'")
 
         tg-create-project-restrictions(
+            is-private="vm.projectForm.is_private"
             can-create-public-projects="vm.canCreatePublicProjects"
             can-create-private-projects="vm.canCreatePrivateProjects"
         )

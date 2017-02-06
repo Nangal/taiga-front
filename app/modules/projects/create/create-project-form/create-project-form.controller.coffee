@@ -34,6 +34,9 @@ class CreatetProjectFormController
         @.canCreatePublicProjects = @currentUserService.canCreatePublicProjects()
         @.canCreatePrivateProjects = @currentUserService.canCreatePrivateProjects()
 
+        if !@.canCreateProject()
+            @.projectForm.is_private = true
+
         if @.type == 'scrum'
             @.projectForm.creation_template = 1
         else
@@ -47,5 +50,14 @@ class CreatetProjectFormController
 
     onCancelForm: () ->
         @location.path(@navUrls.resolve("create-project"))
+
+    canCreateProject: () ->
+        if @.projectForm.is_private
+            return @.canCreatePrivateProjects.valid
+        else
+            return @.canCreatePublicProjects.valid
+
+    isDisabled: () ->
+        return @.formSubmitLoading || !@.canCreateProject()
 
 angular.module('taigaProjects').controller('CreateProjectFormCtrl', CreatetProjectFormController)

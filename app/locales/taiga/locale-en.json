@@ -948,7 +948,7 @@
             "MAX_PUBLIC_PROJECTS": "Unfortunately, You've reached the maximum number of public projects.\nIf you would like to increase the current limit please contact the administrator.",
             "PUBLIC_PROJECT": "Public Project",
             "PRIVATE_PROJECT": "Private Project",
-            "MAX_MEMBERS": "The current project has more member than the limit allowed by your plan.\n Unselect some members or contact the administrator.",
+            "MAX_MEMBERS": "Unfortunately, your current plan allows for a maximum of {{max_memberships}} members per project.\n Unselect some members or contact the administrator.",
             "PRIVATE_PROJECT": "Private Project"
         },
         "COMMON": {

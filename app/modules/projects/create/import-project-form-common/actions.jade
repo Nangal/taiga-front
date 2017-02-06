@@ -7,7 +7,7 @@
     )
     button.button-green.create-project-action-submit.e2e-create-project-action-submit(
         type="submit"
-        ng-disabled="vm.isDisabled()"
+        ng-disabled="projectForm.$invalid || vm.isDisabled()"
         tg-loading="vm.formSubmitLoading"
         translate="PROJECT.CREATE.TITLE"
     )

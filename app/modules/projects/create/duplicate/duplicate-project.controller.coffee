@@ -38,11 +38,15 @@ class DuplicateProjectController
             is_private: false
         }
 
+        if !@.canCreateProject()
+            @.projectForm.is_private = true
+
     refreshReferenceProject: (slug) ->
         @projectsService.getProjectBySlug(slug).then (project) =>
             @.referenceProject = project
             @.members = project.get('members')
             @.invitedMembers = @.members.map (it) -> return it.get('id')
+            @.checkUsersLimit()
 
     toggleInvitedMember: (member) ->
         if @.invitedMembers.includes(member)
@@ -50,18 +54,13 @@ class DuplicateProjectController
         else
             @.invitedMembers = @.invitedMembers.push(member)
 
-        @.checkUsersLimit(@.invitedMembers)
+        @.checkUsersLimit()
 
-    checkUsersLimit: (members) ->
-        size = members.size
-        @.limitMembersPrivateProject = undefined
-        @.limitMembersPublicProject = undefined
-        if @.projectForm.is_private
-            @.limitMembersPublicProject = false
-            @.limitMembersPrivateProject = @.user.get('max_memberships_private_projects') < size
-        else if !@.projectForm.is_private && @.user.get('max_memberships_public_projects')
-            @.limitMembersPrivateProject = false
-            @.limitMembersPublicProject = @.user.get('max_memberships_public_projects') < size
+    checkUsersLimit: () ->
+        size = @.invitedMembers.size
+
+        @.limitMembersPrivateProject = @.user.get('max_memberships_private_projects') < size
+        @.limitMembersPublicProject = @.user.get('max_memberships_public_projects') < size
 
     submit: () ->
         projectId = @.referenceProject.get('id')
@@ -73,8 +72,14 @@ class DuplicateProjectController
             @location.path(@navUrls.resolve("project", {project: newProject.data.slug}))
             @currentUserService.loadProjects()
 
+    canCreateProject: () ->
+        if @.projectForm.is_private
+            return @.canCreatePrivateProjects.valid
+        else
+            return @.canCreatePublicProjects.valid
+
     isDisabled: () ->
-        return !@.projectForm.description || !@.referenceProject || @.loading || @.limitMembersPrivateProject || @.limitMembersPublicProject
+        return @.formSubmitLoading || !@.canCreateProject() || @.limitMembersPrivateProject || @.limitMembersPublicProject
 
     onCancelForm: () ->
         @location.path(@navUrls.resolve("create-project"))
