@@ -47,14 +47,14 @@
             on-toggle-invited-member="vm.toggleInvitedMember(member)"
         )
 
-        div.create-project-warning(ng-if="vm.projectForm.is_private && vm.limitMembersPrivateProject")
+        div.create-project-warning(ng-if="vm.projectForm.is_private && !vm.limitMembersPrivateProject.valid")
             tg-svg(svg-icon="icon-exclamation")
             span(
                 translate="PROJECT.CREATE.MAX_MEMBERS"
                 translate-values="{max_memberships: vm.user.get('max_memberships_private_projects')}"
             )
 
-        div.create-project-warning(ng-if="!vm.projectForm.is_private && vm.limitMembersPublicProject")
+        div.create-project-warning(ng-if="!vm.projectForm.is_private && !vm.limitMembersPublicProject.valid")
             tg-svg(svg-icon="icon-exclamation")
             span(
                 translate="PROJECT.CREATE.MAX_MEMBERS"

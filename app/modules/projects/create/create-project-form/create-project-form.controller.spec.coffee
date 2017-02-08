@@ -31,8 +31,8 @@ describe "CreateProjectFormCtrl", ->
 
     _mockCurrentUserService = ->
         mocks.currentUserService = {
-            canCreatePublicProjects: sinon.stub(),
-            canCreatePrivateProjects: sinon.stub()
+            canCreatePublicProjects: sinon.stub().returns({valid: true}),
+            canCreatePrivateProjects: sinon.stub().returns({valid: true})
         }
 
         $provide.value("tgCurrentUserService", mocks.currentUserService)
@@ -95,3 +95,45 @@ describe "CreateProjectFormCtrl", ->
             expect(ctrl.formSubmitLoading).to.be.true
 
             expect(mocks.location.url).to.have.been.calledWith('project-url')
+
+    it 'check if the user can create a private projects', () ->
+        mocks.currentUserService.canCreatePrivateProjects = sinon.stub().returns({valid: true})
+
+        ctrl = $controller("CreateProjectFormCtrl")
+
+        ctrl.projectForm = {
+            is_private: true
+        }
+
+        expect(ctrl.canCreateProject()).to.be.true
+
+        mocks.currentUserService.canCreatePrivateProjects = sinon.stub().returns({valid: false})
+
+        ctrl = $controller("CreateProjectFormCtrl")
+
+        ctrl.projectForm = {
+            is_private: true
+        }
+
+        expect(ctrl.canCreateProject()).to.be.false
+
+    it 'check if the user can create a public projects', () ->
+        mocks.currentUserService.canCreatePublicProjects = sinon.stub().returns({valid: true})
+
+        ctrl = $controller("CreateProjectFormCtrl")
+
+        ctrl.projectForm = {
+            is_private: false
+        }
+
+        expect(ctrl.canCreateProject()).to.be.true
+
+        mocks.currentUserService.canCreatePublicProjects = sinon.stub().returns({valid: false})
+
+        ctrl = $controller("CreateProjectFormCtrl")
+
+        ctrl.projectForm = {
+            is_private: false
+        }
+
+        expect(ctrl.canCreateProject()).to.be.false

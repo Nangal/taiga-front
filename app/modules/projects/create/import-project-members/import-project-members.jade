@@ -2,9 +2,16 @@
     div(ng-include="'projects/create/import/import-header.html'")
 
     h2.import-project-members-title(translate="PROJECT.IMPORT.PROJECT_MEMBERS")
-    p(translate="PROJECT.IMPORT.PROCESS_DESCRIPTION", translate-values="{platform: vm.platform}")
+    p(
+        translate="PROJECT.IMPORT.PROCESS_DESCRIPTION",
+        translate-values="{'platform': vm.platform}"
+    )
 
-    .spin(tg-loading="!!!vm.members.size")
+    tg-create-project-members-restrictions(
+        is-private="vm.project.get('is_private')"
+        limit-members-private-project="vm.limitMembersPrivateProject"
+        limit-members-public-project="vm.limitMembersPublicProject"
+    )
 
     .import-project-members-system(ng-if="vm.members.size")
         .import-project-members-logo
@@ -33,7 +40,7 @@
                         tg-svg(svg-icon="icon-close")
 
                 .import-project-members-selected(ng-if="vm.getUser(member) && !vm.showSuggestedMatch(member)")
-                    button.import-project-members-delete(ng-click="vm.cleanMember(member)")
+                    button.import-project-members-delete(ng-click="vm.unselectUser(member)")
                         tg-svg(svg-icon="icon-close")
                     span {{vm.getUser(member).get('full_name')}}
                     span.import-project-members-selected-img
@@ -53,8 +60,10 @@
 
     tg-select-import-user-lightbox.lightbox(
        visible="vm.selectImportUserLightbox"
-       on-close="vm.selectImportUserLightbox = false"
        user="vm.searchingUser"
+       max-members="vm.project.get('is_private') ? vm.limitMembersPrivateProject.max : vm.limitMembersPublicProject.max"
+       selectable-users="vm.selectableUsers"
+       on-close="vm.selectImportUserLightbox = false"
        on-select-user="vm.confirmUser(user, taigaUser)"
     )
 

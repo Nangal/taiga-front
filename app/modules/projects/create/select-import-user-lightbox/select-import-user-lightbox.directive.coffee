@@ -36,10 +36,12 @@ SelectImportUserLightboxDirective = (lightboxService, lightboxKeyboardNavigation
         controllerAs: "vm",
         bindToController: true,
         scope: {
+            user: '<',
             visible: '<',
             onClose: '&',
             onSelectUser: '&',
-            user: '<'
+            selectableUsers: '<',
+            maxMembers: '<'
         },
         templateUrl: 'projects/create/select-import-user-lightbox/select-import-user-lightbox.html'
         link: link

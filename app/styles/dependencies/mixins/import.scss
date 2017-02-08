@@ -44,13 +44,8 @@
     }
 }
 @mixin import-members {
-     @include centered;
+    @include centered;
     max-width: 800px;
-    .spin {
-        text-align: center;
-        width: 100%;
-    }
-
     &-title {
         @include font-size(normal);
         @include font-type(bold);

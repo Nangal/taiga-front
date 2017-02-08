@@ -34,6 +34,9 @@ describe "DuplicateProjectController", ->
 
         mocks.currentUserService.loadProjects = sinon.stub()
 
+        mocks.currentUserService.canAddMembersPrivateProject = sinon.stub()
+        mocks.currentUserService.canAddMembersPublicProject = sinon.stub()
+
         provide.value "tgCurrentUserService", mocks.currentUserService
 
     _mockProjectService = () ->
@@ -125,67 +128,10 @@ describe "DuplicateProjectController", ->
             expect(ctrl.members).to.be.equal(project.get('members'))
             expect(ctrl.invitedMembers.toJS()).to.be.eql([1, 2, 3])
 
-    it 'user can invite more members in private project', () ->
-        members = Immutable.fromJS([
-            {id: 1},
-            {id: 2},
-            {id: 3}
-        ])
-        size = members.size #3
+    it 'check users limits', () ->
+        mocks.currentUserService.canAddMembersPrivateProject.withArgs(3).returns(1)
+        mocks.currentUserService.canAddMembersPublicProject.withArgs(3).returns(2)
 
-        ctrl.user = Immutable.fromJS({
-            max_memberships_public_projects: 100
-            max_memberships_private_projects: 100
-        })
-
-        ctrl.projectForm = {}
-        ctrl.projectForm.is_private = true
-
-        ctrl.checkUsersLimit(members)
-        expect(ctrl.limitMembersPublicProject).to.be.false
-        expect(ctrl.limitMembersPrivateProject).to.be.false
-
-    it 'user cannot invite more members in private project', () ->
-        members = Immutable.fromJS([
-            {id: 1},
-            {id: 2},
-            {id: 3}
-        ])
-        size = members.size #3
-
-        ctrl.user = Immutable.fromJS({
-            max_memberships_public_projects: 1
-            max_memberships_private_projects: 1
-        })
-
-        ctrl.projectForm = {}
-        ctrl.projectForm.is_private = true
-
-        ctrl.checkUsersLimit(members)
-        expect(ctrl.limitMembersPublicProject).to.be.false
-        expect(ctrl.limitMembersPrivateProject).to.be.true
-
-    it 'user can invite more members in public project', () ->
-        members = Immutable.fromJS([
-            {id: 1},
-            {id: 2},
-            {id: 3}
-        ])
-        size = members.size #3
-
-        ctrl.user = Immutable.fromJS({
-            max_memberships_public_projects: 100
-            max_memberships_private_projects: 100
-        })
-
-        ctrl.projectForm = {}
-        ctrl.projectForm.is_private = false
-
-        ctrl.checkUsersLimit(members)
-        expect(ctrl.limitMembersPrivateProject).to.be.false
-        expect(ctrl.limitMembersPublicProject).to.be.false
-
-    it 'user cannot invite more members in public project', () ->
         members = Immutable.fromJS([
             {id: 1},
             {id: 2},
@@ -200,10 +146,11 @@ describe "DuplicateProjectController", ->
 
         ctrl.projectForm = {}
         ctrl.projectForm.is_private = false
+        ctrl.invitedMembers = members
 
-        ctrl.checkUsersLimit(members)
-        expect(ctrl.limitMembersPrivateProject).to.be.false
-        expect(ctrl.limitMembersPublicProject).to.be.true
+        ctrl.checkUsersLimit()
+        expect(ctrl.limitMembersPrivateProject).to.be.equal(1)
+        expect(ctrl.limitMembersPublicProject).to.be.equal(2)
 
     it 'duplicate project', (done) ->
         ctrl.referenceProject = Immutable.fromJS({
@@ -229,3 +176,45 @@ describe "DuplicateProjectController", ->
             expect(mocks.location.path).to.be.calledWith("/project/slug/")
             expect(mocks.currentUserService.loadProjects).to.have.been.called
             done()
+
+    it 'check if the user can create a private projects', () ->
+        mocks.currentUserService.canCreatePrivateProjects = sinon.stub().returns({valid: true})
+
+        ctrl = controller "DuplicateProjectCtrl"
+
+        ctrl.projectForm = {
+            is_private: true
+        }
+
+        expect(ctrl.canCreateProject()).to.be.true
+
+        mocks.currentUserService.canCreatePrivateProjects = sinon.stub().returns({valid: false})
+
+        ctrl = controller "DuplicateProjectCtrl"
+
+        ctrl.projectForm = {
+            is_private: true
+        }
+
+        expect(ctrl.canCreateProject()).to.be.false
+
+    it 'check if the user can create a public projects', () ->
+        mocks.currentUserService.canCreatePublicProjects = sinon.stub().returns({valid: true})
+
+        ctrl = controller "DuplicateProjectCtrl"
+
+        ctrl.projectForm = {
+            is_private: false
+        }
+
+        expect(ctrl.canCreateProject()).to.be.true
+
+        mocks.currentUserService.canCreatePublicProjects = sinon.stub().returns({valid: false})
+
+        ctrl = controller "DuplicateProjectCtrl"
+
+        ctrl.projectForm = {
+            is_private: false
+        }
+
+        expect(ctrl.canCreateProject()).to.be.false

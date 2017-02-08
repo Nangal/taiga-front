@@ -22,6 +22,14 @@ describe "GithubImportCtrl", ->
     $controller = null
     mocks = {}
 
+    _mockCurrentUserService = ->
+        mocks.currentUserService = {
+            canAddMembersPrivateProject: sinon.stub()
+            canAddMembersPublicProject: sinon.stub()
+        }
+
+        $provide.value("tgCurrentUserService", mocks.currentUserService)
+
     _mockImportProjectService = ->
         mocks.importProjectService = {
             importPromise: sinon.stub()
@@ -60,6 +68,7 @@ describe "GithubImportCtrl", ->
             _mockConfirm()
             _mockTranslate()
             _mockImportProjectService()
+            _mockCurrentUserService()
 
             return null
 
@@ -83,17 +92,25 @@ describe "GithubImportCtrl", ->
         expect(ctrl.step).to.be.equal('project-select-github')
         expect(mocks.githubService.fetchProjects).have.been.called
 
-    it "on select project reload projects", () ->
+    it "on select project reload projects", (done) ->
         project = Immutable.fromJS({
             id: 1,
             name: "project-name"
         })
 
-        ctrl = $controller("GithubImportCtrl")
-        ctrl.onSelectProject(project)
+        mocks.githubService.fetchUsers.promise().resolve()
 
-        expect(ctrl.step).to.be.equal('project-form-github')
-        expect(ctrl.project).to.be.equal(project)
+        ctrl = $controller("GithubImportCtrl")
+
+        promise = ctrl.onSelectProject(project)
+
+        expect(ctrl.fetchingUsers).to.be.true
+
+        promise.then () ->
+            expect(ctrl.fetchingUsers).to.be.false
+            expect(ctrl.step).to.be.equal('project-form-github')
+            expect(ctrl.project).to.be.equal(project)
+            done()
 
     it "on save project details reload users", () ->
         project = Immutable.fromJS({
@@ -106,8 +123,6 @@ describe "GithubImportCtrl", ->
 
         expect(ctrl.step).to.be.equal('project-members-github')
         expect(ctrl.project).to.be.equal(project)
-
-        expect(mocks.githubService.fetchUsers).have.been.called
 
     it "on select user init import", (done) ->
         users = Immutable.fromJS([

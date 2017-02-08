@@ -18,11 +18,25 @@
 ###
 
 class ImportProjectMembersController
-    constructor: () ->
+    @.$inject = [
+        'tgCurrentUserService',
+        'tgUserService'
+    ]
+
+    constructor: (@currentUserService, @userService) ->
         @.selectImportUserLightbox = false
         @.warningImportUsers = false
-        @.selectedUsers = Immutable.List()
         @.cancelledUsers = Immutable.List()
+        @.selectedUsers = Immutable.List()
+        @.selectableUsers = Immutable.List()
+        @.userContacts = Immutable.List()
+
+    fetchUser: () ->
+        @.currentUser = @currentUserService.getUser()
+
+        @userService.getContacts(@.currentUser.get('id')).then (userContacts) =>
+            @.userContacts = userContacts
+            @.refreshSelectableUsers()
 
     searchUser: (user) ->
         @.selectImportUserLightbox = true
@@ -43,16 +57,18 @@ class ImportProjectMembersController
         user = user.set('taigaUser', taigaUser)
 
         @.selectedUsers = @.selectedUsers.push(user)
-
         @.discardSuggestedUser(externalUser)
+
+        @.refreshSelectableUsers()
+
+    unselectUser: (user) ->
+        index = @.selectedUsers.findIndex (it) -> it.getIn(['user', 'id']) == user.get('id')
+
+        @.selectedUsers = @.selectedUsers.delete(index)
+        @.refreshSelectableUsers()
 
     discardSuggestedUser: (member) ->
         @.cancelledUsers = @.cancelledUsers.push(member.get('id'))
-
-    cleanMember: (member) ->
-        index = @.selectedUsers.findIndex (it) -> it.getIn(['user', 'id']) == member.get('id')
-
-        @.selectedUsers = @.selectedUsers.delete(index)
 
     getSelectedMember: (member) ->
         return @.selectedUsers.find (it) ->
@@ -73,13 +89,46 @@ class ImportProjectMembersController
         @.warningImportUsers = false
 
         users = Immutable.Map()
-
-        @.selectedUsers.map (it) ->
-            users = users.set(it.getIn(['user', 'id']), it.getIn(['taigaUser', 'id']))
+        @.selectedUsers.map (it) -> users = users.set(it.getIn(['user', 'id']), it.getIn(['taigaUser', 'id']))
 
         @.onSubmit({users: users})
 
+    checkUsersLimit: () ->
+        @.limitMembersPrivateProject = @currentUserService.canAddMembersPrivateProject(@.members.size)
+        @.limitMembersPublicProject = @currentUserService.canAddMembersPublicProject(@.members.size)
+
     showSuggestedMatch: (member) ->
         return member.get('user') && @.cancelledUsers.indexOf(member.get('id')) == -1 && !@.isMemberSelected(member)
+
+    getDistinctSelectedTaigaUsers: () ->
+        ids = []
+
+        return @.selectedUsers.filter (it) ->
+            id = it.getIn(['taigaUser', 'id'])
+
+            if ids.indexOf(id) == -1
+                ids.push(id)
+                return true
+
+            return false
+
+    refreshSelectableUsers: () ->
+        importMoreUsersDisabled = @.isImportMoreUsersDisabled()
+
+        if importMoreUsersDisabled
+            users = @.getDistinctSelectedTaigaUsers()
+
+            @.selectableUsers = users.map (it) -> return it.get('taigaUser')
+        else
+            @.selectableUsers = @.userContacts.push(@.currentUser)
+
+    isImportMoreUsersDisabled: () ->
+        users = @.getDistinctSelectedTaigaUsers()
+
+        if @.project.get('is_private')
+            return !@currentUserService.canAddMembersPrivateProject(users.size + 1).valid
+        else
+            return !@currentUserService.canAddMembersPublicProject(users.size + 1).valid
+
 
 angular.module('taigaProjects').controller('ImportProjectMembersCtrl', ImportProjectMembersController)

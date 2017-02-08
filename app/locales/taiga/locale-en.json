@@ -983,13 +983,15 @@
             "EMAIL_NOT_FOUND": "We did not find any users with that email",
             "ACCEEDE": "Acceede",
             "PROJECT_MEMBERS": "Project Members",
-            "PROCESS_DESCRIPTION": "Match these {{platform}} users with their user in Taiga so we can assign the tasks correctly",
+            "PROCESS_DESCRIPTION": "Tell us who from Taiga you want to assign the tasks of {{platform}}",
             "MATCH": "Is <strong>{{user_external}}</strong> the same person as <strong>{{user_internal}}</strong>?",
             "CHOOSE": "Select user",
             "LINKS": "Links with {{platform}}",
             "LINKS_DESCRIPTION": "Do you want to keep the link of each item with the original {{platform}} card?",
             "PROJECT_RESTRICTIONS": {
-                "PROJECT_MEMBERS_DESC": "The project you are trying to import has {{members}} members, unfortunately, your current plan allows for a maximum of {{max_memberships}} members per project. If you would like to increase that limit please contact the administrator.",
+                "PROJECT_MEMBERS_DESC_PRIVATE": "The project you are trying to import has {{members}} members, unfortunately, your current plan allows for a maximum of {{max_memberships}} members per private project. If you would like to increase that limit please contact the administrator.",
+                "PROJECT_MEMBERS_DESC_PUBLIC": "The project you are trying to import has {{members}} members, unfortunately, your current plan allows for a maximum of {{max_memberships}} members per public project. If you would like to increase that limit please contact the administrator.",
+                "ACCOUNT_ALLOW_MEMBERS": "Your account only allows {{members}} members",
                 "PRIVATE_PROJECTS_SPACE": {
                     "TITLE": "Unfortunately, your current plan does not allow for additional private projects",
                     "DESC": "The project you are trying to import is private. Unfortunately, your current plan does not allow for additional private projects."
@@ -1035,7 +1037,6 @@
                 "SELECTOR": "Import your Github project issues",
                 "CHOOSE_BOARD": "Find the project you want to import",
                 "PROJECT_MEMBERS": "Project Members",
-                "PROCESS_DESCRIPTION": "Match these Github users with their user in Taiga so we can assign the tasks correctly",
                 "HOW_DO_YOU_WANT_TO_IMPORT": "How do you want to import your issues into Taiga?",
                 "KANBAN_PROJECT": "As user stories in a kanban project",
                 "KANBAN_PROJECT_DESCRIPTION": "After that you can enable scrum with backlog.",
@@ -1052,8 +1053,7 @@
                 "SCRUM_PROJECT": "Scrum",
                 "CREATE_AS_SCRUM_DESCRIPTION": "The tasks and sub-tasks of your project will be created as Taiga user stories and tasks.",
                 "CREATE_AS_KANBAN_DESCRIPTION": "The tasks and sub-tasks of your project will be created as Taiga user stories and tasks.",
-                "PROJECT_MEMBERS": "Project Members",
-                "PROCESS_DESCRIPTION": "Match these Asana users with their user in Taiga so we can assign the tasks correctly"
+                "PROJECT_MEMBERS": "Project Members"
             },
             "JIRA": {
                 "TITLE": "Jira",
@@ -1061,7 +1061,6 @@
                 "SELECTOR": "Import your Jira project and choose how to manage it",
                 "URL": "Your Jira URL",
                 "PROJECT_MEMBERS": "Project Members",
-                "PROCESS_DESCRIPTION": "Match these Jira users with their user in Taiga so we can assign the tasks correctly",
                 "KANBAN_PROJECT": "Kanban",
                 "SCRUM_PROJECT": "Scrum",
                 "ISSUES_PROJECT": "Issues",

@@ -18,23 +18,13 @@
 ###
 
 class SelectImportUserLightboxCtrl
-    @.$inject = [
-        'tgUserService',
-        'tgCurrentUserService'
-    ]
+    @.$inject = []
 
-    constructor: (@userService, @currentUserService) ->
+    constructor: () ->
 
     start: () ->
-        @.currentUser = @currentUserService.getUser()
-
         @.mode = 'search'
         @.invalid = false
-
-        @userService.getContacts(@.currentUser.get('id')).then(@.setContacts.bind(this))
-
-    setContacts: (contacts) ->
-        @.users = contacts.push(@.currentUser)
 
     searchUser: () ->
         @.invalid = true

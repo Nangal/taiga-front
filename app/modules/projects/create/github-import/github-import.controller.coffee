@@ -18,6 +18,13 @@
 ###
 
 class GithubImportController
+    @.$inject = [
+        'tgGithubImportService',
+        '$tgConfirm',
+        '$translate',
+        'tgImportProjectService',
+    ]
+
     constructor: (@githubImportService, @confirm, @translate, @importProjectService) ->
         @.step = 'autorization-github'
         @.project = null
@@ -32,12 +39,13 @@ class GithubImportController
     onSelectProject: (project) ->
         @.step = 'project-form-github'
         @.project = project
+        @.fetchingUsers = true
+
+        @githubImportService.fetchUsers(@.project.get('id')).then () => @.fetchingUsers = false
 
     onSaveProjectDetails: (project) ->
         @.project = project
         @.step = 'project-members-github'
-
-        @githubImportService.fetchUsers(@.project.get('id'))
 
     startImport: (users) ->
         loader = @confirm.loader(@translate.instant('PROJECT.IMPORT.IN_PROGRESS.TITLE'), @translate.instant('PROJECT.IMPORT.IN_PROGRESS.DESCRIPTION'), true)
@@ -56,13 +64,8 @@ class GithubImportController
 
         @importProjectService.importPromise(promise).then () => loader.stop()
 
-    onSelectUsers: (users) ->
+    submitUserSelection: (users) ->
         @.startImport(users)
         return null
 
-angular.module('taigaProjects').controller('GithubImportCtrl', [
-    'tgGithubImportService',
-    '$tgConfirm',
-    '$translate',
-    'tgImportProjectService',
-    GithubImportController])
+angular.module('taigaProjects').controller('GithubImportCtrl', GithubImportController)

@@ -5,6 +5,13 @@ tg-lightbox-close(on-close="vm.onClose()")
 
     p.candidate-user {{vm.user.get('full_name')}}
 
+    div.create-project-warning
+        tg-svg(svg-icon="icon-exclamation")
+        span(
+            translate="PROJECT.IMPORT.PROJECT_RESTRICTIONS.ACCOUNT_ALLOW_MEMBERS",
+            translate-values="{'members': vm.maxMembers}"
+        )
+
     form(ng-if="vm.mode == 'mail'", ng-submit="vm.searchUser()")
         fieldset
             p.error(ng-if="vm.invalid", translate="PROJECT.IMPORT.EMAIL_NOT_FOUND")
@@ -42,9 +49,10 @@ tg-lightbox-close(on-close="vm.onClose()")
                 placeholder="{{'LIGHTBOX.ASSIGNED_TO.SEARCH' | translate}}",
                 ng-model="vm.usersSearch"
             )
+
         .assigned-to-list
             .user-list-single(
-                ng-repeat="user in vm.users | toMutable | filter: vm.usersSearch | orderBy:'full_name_display' | limitTo: 5 as filteredCollection",
+                ng-repeat="user in vm.selectableUsers | toMutable | filter: vm.usersSearch | orderBy:'full_name_display' | limitTo: 5 as filteredCollection",
                 ng-click="vm.selectUser(user)"
             )
                 .user-list-avatar

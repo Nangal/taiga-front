@@ -22,17 +22,57 @@ describe "ImportProjectMembersCtrl", ->
     $controller = null
     mocks = {}
 
+    _mockCurrentUserService = ->
+        mocks.currentUserService = {
+            getUser: sinon.stub().returns(Immutable.fromJS({
+                id: 1
+            })),
+            canAddMembersPrivateProject: sinon.stub(),
+            canAddMembersPublicProject: sinon.stub()
+        }
+
+        $provide.value("tgCurrentUserService", mocks.currentUserService)
+
+    _mockUserService = ->
+        mocks.userService = {
+            getContacts: sinon.stub()
+        }
+
+        $provide.value("tgUserService", mocks.userService)
+
     _inject = ->
         inject (_$controller_) ->
             $controller = _$controller_
 
+    _mocks = ->
+        module (_$provide_) ->
+            $provide = _$provide_
+
+            _mockCurrentUserService()
+            _mockUserService()
+
+            return null
+
     _setup = ->
+        _mocks()
         _inject()
 
     beforeEach ->
         module "taigaProjects"
 
         _setup()
+
+    it "fetch user info", (done) ->
+        ctrl = $controller("ImportProjectMembersCtrl")
+
+        ctrl.refreshSelectableUsers = sinon.spy()
+
+        mocks.userService.getContacts.withArgs(1).promise().resolve('contacts')
+
+        ctrl.fetchUser().then () ->
+            expect(ctrl.userContacts).to.be.equal('contacts')
+            expect(ctrl.refreshSelectableUsers).have.been.called
+            done()
 
     it "search user", () ->
         ctrl = $controller("ImportProjectMembersCtrl")
@@ -95,6 +135,7 @@ describe "ImportProjectMembersCtrl", ->
         ctrl = $controller("ImportProjectMembersCtrl")
 
         ctrl.discardSuggestedUser = sinon.spy()
+        ctrl.refreshSelectableUsers = sinon.spy()
 
         ctrl.confirmUser('user', 'taiga-user')
 
@@ -103,6 +144,7 @@ describe "ImportProjectMembersCtrl", ->
         expect(ctrl.selectedUsers.get(0).get('user')).to.be.equal('user')
         expect(ctrl.selectedUsers.get(0).get('taigaUser')).to.be.equal('taiga-user')
         expect(ctrl.discardSuggestedUser).have.been.called
+        expect(ctrl.refreshSelectableUsers).have.been.called
 
     it "discard suggested user", () ->
         ctrl = $controller("ImportProjectMembersCtrl")
@@ -115,6 +157,8 @@ describe "ImportProjectMembersCtrl", ->
 
     it "clean member selection", () ->
         ctrl = $controller("ImportProjectMembersCtrl")
+
+        ctrl.refreshSelectableUsers = sinon.spy()
 
         ctrl.selectedUsers = Immutable.fromJS([
             {
@@ -129,11 +173,12 @@ describe "ImportProjectMembersCtrl", ->
             }
         ])
 
-        ctrl.cleanMember(Immutable.fromJS({
+        ctrl.unselectUser(Immutable.fromJS({
             id: 2
         }))
 
         expect(ctrl.selectedUsers.size).to.be.equal(1)
+        expect(ctrl.refreshSelectableUsers).have.been.called
 
 
     it "get a selected member", () ->
@@ -208,3 +253,99 @@ describe "ImportProjectMembersCtrl", ->
         })
 
         expect(ctrl.showSuggestedMatch(member)).to.be.false
+
+    it "check users limit", () ->
+        ctrl = $controller("ImportProjectMembersCtrl")
+
+        ctrl.members = Immutable.fromJS([
+            1, 2, 3
+        ])
+
+        mocks.currentUserService.canAddMembersPrivateProject.withArgs(3).returns('xx')
+        mocks.currentUserService.canAddMembersPublicProject.withArgs(3).returns('yy')
+
+        ctrl.checkUsersLimit()
+
+        expect(ctrl.limitMembersPrivateProject).to.be.equal('xx')
+        expect(ctrl.limitMembersPublicProject).to.be.equal('yy')
+
+
+     it "get distict select taiga users", () ->
+        ctrl = $controller("ImportProjectMembersCtrl")
+        ctrl.selectedUsers = Immutable.fromJS([
+            {
+                taigaUser: {
+                    id: 1
+                }
+            },
+            {
+                taigaUser: {
+                    id: 1
+                }
+            },
+            {
+                taigaUser: {
+                    id: 3
+                }
+            }
+        ])
+
+        users = ctrl.getDistinctSelectedTaigaUsers()
+
+        expect(users.size).to.be.equal(2)
+
+     it "refresh selectable users array with all users available", () ->
+        ctrl = $controller("ImportProjectMembersCtrl")
+
+        ctrl.isImportMoreUsersDisabled = sinon.stub().returns(false)
+
+        ctrl.userContacts = Immutable.fromJS([1])
+        ctrl.currentUser = 2
+
+        ctrl.refreshSelectableUsers()
+
+        expect(ctrl.selectableUsers.toJS()).to.be.eql([1, 2])
+
+
+     it "refresh selectable users array with the selected ones", () ->
+        ctrl = $controller("ImportProjectMembersCtrl")
+
+        ctrl.getDistinctSelectedTaigaUsers = sinon.stub().returns(Immutable.fromJS([
+            {taigaUser: 1},
+            {taigaUser: 2}
+        ]))
+
+        ctrl.isImportMoreUsersDisabled = sinon.stub().returns(true)
+
+        ctrl.userContacts = Immutable.fromJS([1])
+        ctrl.currentUser = 2
+
+        ctrl.refreshSelectableUsers()
+
+        expect(ctrl.selectableUsers.toJS()).to.be.eql([1, 2])
+
+    it "import more user disable in private project", () ->
+        ctrl = $controller("ImportProjectMembersCtrl")
+
+        ctrl.project = Immutable.fromJS({
+            is_private: true
+        })
+
+        ctrl.getDistinctSelectedTaigaUsers = sinon.stub().returns(Immutable.fromJS([1,2,3]))
+
+        mocks.currentUserService.canAddMembersPrivateProject.withArgs(4).returns({valid: true})
+
+        expect(ctrl.isImportMoreUsersDisabled()).to.be.false
+
+    it "import more user disable in public project", () ->
+        ctrl = $controller("ImportProjectMembersCtrl")
+
+        ctrl.project = Immutable.fromJS({
+            is_private: false
+        })
+
+        ctrl.getDistinctSelectedTaigaUsers = sinon.stub().returns(Immutable.fromJS([1,2,3]))
+
+        mocks.currentUserService.canAddMembersPublicProject.withArgs(4).returns({valid: true})
+
+        expect(ctrl.isImportMoreUsersDisabled()).to.be.false

@@ -57,10 +57,8 @@ class DuplicateProjectController
         @.checkUsersLimit()
 
     checkUsersLimit: () ->
-        size = @.invitedMembers.size
-
-        @.limitMembersPrivateProject = @.user.get('max_memberships_private_projects') < size
-        @.limitMembersPublicProject = @.user.get('max_memberships_public_projects') < size
+        @.limitMembersPrivateProject = @currentUserService.canAddMembersPrivateProject(@.invitedMembers.size)
+        @.limitMembersPublicProject = @currentUserService.canAddMembersPublicProject(@.invitedMembers.size)
 
     submit: () ->
         projectId = @.referenceProject.get('id')

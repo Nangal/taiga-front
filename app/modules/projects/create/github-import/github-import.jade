@@ -12,17 +12,19 @@ tg-import-project-selector(
 )
 
 tg-github-import-project-form(
+    ng-if="vm.step == 'project-form-github'"
     project="vm.project"
+    members="vm.members"
+    fetching-users="vm.fetchingUsers"
     on-save-project-details="vm.onSaveProjectDetails(project)"
     on-cancel-form="vm.step = 'project-select-github'"
-    ng-if="vm.step == 'project-form-github'"
 )
 
 tg-import-project-members(
+    ng-if="vm.step == 'project-members-github'"
     platform="Github"
     logo="/#{v}/images/import-logos/github.png"
     project="vm.project"
     members="vm.members"
-    ng-if="vm.step == 'project-members-github'"
-    on-submit="vm.onSelectUsers(users)"
+    on-submit="vm.submitUserSelection(users)"
 )

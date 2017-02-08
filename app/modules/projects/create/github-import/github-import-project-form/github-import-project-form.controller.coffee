@@ -36,6 +36,10 @@ class GithubImportProjectFormController
         if !@.canCreateProject()
             @.projectForm.is_private = true
 
+    checkUsersLimit: () ->
+        @.limitMembersPrivateProject = @currentUserService.canAddMembersPrivateProject(@.members.size)
+        @.limitMembersPublicProject = @currentUserService.canAddMembersPublicProject(@.members.size)
+
     saveForm: () ->
         @.onSaveProjectDetails({project: Immutable.fromJS(@.projectForm)})
 
