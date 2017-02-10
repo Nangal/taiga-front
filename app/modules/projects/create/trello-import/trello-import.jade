@@ -8,17 +8,19 @@ tg-import-project-selector(
 )
 
 tg-trello-import-project-form(
+    ng-if="vm.step == 'project-form-trello'"
     project="vm.project"
+    members="vm.members"
+    fetching-users="vm.fetchingUsers"
     on-save-project-details="vm.onSaveProjectDetails(project)"
     on-cancel-form="vm.step = 'project-select-trello'"
-    ng-if="vm.step == 'project-form-trello'"
 )
 
 tg-import-project-members(
+    ng-if="vm.step == 'project-members-trello'"
     platform="Trello"
     logo="/#{v}/images/import-logos/trello.png"
     project="vm.project"
     members="vm.members"
-    ng-if="vm.step == 'project-members-trello'"
-    on-submit="vm.onSelectUsers(users)"
+    on-submit="vm.submitUserSelection(users)"
 )

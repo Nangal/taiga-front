@@ -18,7 +18,14 @@
 ###
 
 class TrelloImportController
-    constructor: (@trelloImportService, @confirm, @translate, @projectUrl, @location) ->
+    @.$inject = [
+        'tgTrelloImportService',
+        '$tgConfirm',
+        '$translate',
+        'tgImportProjectService',
+    ]
+
+    constructor: (@trelloImportService, @confirm, @translate, @importProjectService) ->
         @.project = null
         taiga.defineImmutableProperty @, 'projects', () => return @trelloImportService.projects
         taiga.defineImmutableProperty @, 'members', () => return @trelloImportService.projectUsers
@@ -29,38 +36,33 @@ class TrelloImportController
     onSelectProject: (project) ->
         @.step = 'project-form-trello'
         @.project = project
+        @.fetchingUsers = true
+
+        @trelloImportService.fetchUsers(@.project.get('id')).then () => @.fetchingUsers = false
 
     onSaveProjectDetails: (project) ->
         @.project = project
         @.step = 'project-members-trello'
-
-        @trelloImportService.fetchUsers(@.project.get('id'))
 
     startImport: (users) ->
         loader = @confirm.loader(@translate.instant('PROJECT.IMPORT.IN_PROGRESS.TITLE'), @translate.instant('PROJECT.IMPORT.IN_PROGRESS.DESCRIPTION'), true)
 
         loader.start()
 
-        @trelloImportService.importProject(
+        promise = @trelloImportService.importProject(
             @.project.get('name'),
             @.project.get('description'),
             @.project.get('id'),
             users,
             @.project.get('keepExternalReference'),
             @.project.get('is_private')
-        ).then (project) =>
-            loader.stop()
-            @location.url(@projectUrl.get(project))
+        )
 
-    onSelectUsers: (users) ->
+        @importProjectService.importPromise(promise).then () => loader.stop()
+
+    submitUserSelection: (users) ->
         @.startImport(users)
 
         return null
 
-angular.module('taigaProjects').controller('TrelloImportCtrl', [
-    'tgTrelloImportService',
-    '$tgConfirm',
-    '$translate',
-    '$projectUrl',
-    '$location',
-    TrelloImportController])
+angular.module('taigaProjects').controller('TrelloImportCtrl', TrelloImportController)

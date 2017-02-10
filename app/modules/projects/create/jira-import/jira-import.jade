@@ -11,17 +11,19 @@ tg-import-project-selector(
 )
 
 tg-jira-import-project-form(
+    ng-if="vm.step == 'project-form-jira'"
     project="vm.project"
+    members="vm.members"
+    fetching-users="vm.fetchingUsers"
     on-save-project-details="vm.onSaveProjectDetails(project)"
     on-cancel-form="vm.step = 'project-select-jira'"
-    ng-if="vm.step == 'project-form-jira'"
 )
 
 tg-import-project-members(
+    ng-if="vm.step == 'project-members-jira'"
     platform="Jira"
     logo="/#{v}/images/import-logos/jira.png"
     project="vm.project"
     members="vm.members"
-    ng-if="vm.step == 'project-members-jira'"
-    on-submit="vm.onSelectUsers(users)"
+    on-submit="vm.submitUserSelection(users)"
 )

@@ -22,6 +22,14 @@ describe "JiraImportCtrl", ->
     $controller = null
     mocks = {}
 
+    _mockCurrentUserService = ->
+        mocks.currentUserService = {
+            canAddMembersPrivateProject: sinon.stub()
+            canAddMembersPublicProject: sinon.stub()
+        }
+
+        $provide.value("tgCurrentUserService", mocks.currentUserService)
+
     _mockJiraImportService = ->
         mocks.jiraService = {
             fetchProjects: sinon.stub(),
@@ -59,6 +67,8 @@ describe "JiraImportCtrl", ->
             _mockConfirm()
             _mockTranslate()
             _mockImportProjectService()
+            _mockCurrentUserService()
+
             return null
 
     _inject = ->
@@ -81,17 +91,25 @@ describe "JiraImportCtrl", ->
         expect(ctrl.step).to.be.equal('project-select-jira')
         expect(mocks.jiraService.fetchProjects).have.been.called
 
-    it "on select project reload projects", () ->
+    it "on select project reload projects", (done) ->
         project = Immutable.fromJS({
             id: 1,
             name: "project-name"
         })
 
-        ctrl = $controller("JiraImportCtrl")
-        ctrl.onSelectProject(project)
+        mocks.jiraService.fetchUsers.promise().resolve()
 
-        expect(ctrl.step).to.be.equal('project-form-jira')
-        expect(ctrl.project).to.be.equal(project)
+        ctrl = $controller("JiraImportCtrl")
+
+        promise = ctrl.onSelectProject(project)
+
+        expect(ctrl.fetchingUsers).to.be.true
+
+        promise.then () ->
+            expect(ctrl.fetchingUsers).to.be.false
+            expect(ctrl.step).to.be.equal('project-form-jira')
+            expect(ctrl.project).to.be.equal(project)
+            done()
 
     it "on save project details reload users", () ->
         project = Immutable.fromJS({
@@ -104,8 +122,6 @@ describe "JiraImportCtrl", ->
 
         expect(ctrl.step).to.be.equal('project-members-jira')
         expect(ctrl.project).to.be.equal(project)
-
-        expect(mocks.jiraService.fetchUsers).have.been.called
 
     it "on select user init import", (done) ->
         users = Immutable.fromJS([

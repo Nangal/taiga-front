@@ -22,6 +22,22 @@ describe "TrelloImportCtrl", ->
     $controller = null
     mocks = {}
 
+    _mockCurrentUserService = ->
+        mocks.currentUserService = {
+            canAddMembersPrivateProject: sinon.stub()
+            canAddMembersPublicProject: sinon.stub()
+        }
+
+        $provide.value("tgCurrentUserService", mocks.currentUserService)
+
+
+    _mockImportProjectService = ->
+        mocks.importProjectService = {
+            importPromise: sinon.stub()
+        }
+
+        $provide.value("tgImportProjectService", mocks.importProjectService)
+
     _mockTrelloImportService = ->
         mocks.trelloService = {
             fetchProjects: sinon.stub(),
@@ -45,20 +61,6 @@ describe "TrelloImportCtrl", ->
 
         $provide.value("$translate", mocks.translate)
 
-    _mockProjectUrl = ->
-        mocks.projectUrl = {
-            get: sinon.stub()
-        }
-
-        $provide.value("$projectUrl", mocks.projectUrl)
-
-    _mockLocation = ->
-        mocks.location = {
-            url: sinon.stub()
-        }
-
-        $provide.value("$location", mocks.location)
-
     _mocks = ->
         module (_$provide_) ->
             $provide = _$provide_
@@ -66,8 +68,8 @@ describe "TrelloImportCtrl", ->
             _mockTrelloImportService()
             _mockConfirm()
             _mockTranslate()
-            _mockProjectUrl()
-            _mockLocation()
+            _mockImportProjectService()
+            _mockCurrentUserService()
 
             return null
 
@@ -93,17 +95,25 @@ describe "TrelloImportCtrl", ->
             expect(ctrl.step).to.be.equal('project-select-trello')
             expect(mocks.trelloService.fetchProjects).have.been.called
 
-    it "on select project reload projects", () ->
+    it "on select project reload projects", (done) ->
         project = Immutable.fromJS({
             id: 1,
             name: "project-name"
         })
 
-        ctrl = $controller("TrelloImportCtrl")
-        ctrl.onSelectProject(project)
+        mocks.trelloService.fetchUsers.promise().resolve()
 
-        expect(ctrl.step).to.be.equal('project-form-trello')
-        expect(ctrl.project).to.be.equal(project)
+        ctrl = $controller("TrelloImportCtrl")
+
+        promise = ctrl.onSelectProject(project)
+
+        expect(ctrl.fetchingUsers).to.be.true
+
+        promise.then () ->
+            expect(ctrl.fetchingUsers).to.be.false
+            expect(ctrl.step).to.be.equal('project-form-trello')
+            expect(ctrl.project).to.be.equal(project)
+            done()
 
     it "on save project details reload users", () ->
         project = Immutable.fromJS({
@@ -117,7 +127,6 @@ describe "TrelloImportCtrl", ->
         expect(ctrl.step).to.be.equal('project-members-trello')
         expect(ctrl.project).to.be.equal(project)
 
-        expect(mocks.trelloService.fetchUsers).have.been.called
 
     it "on select user init import", (done) ->
         users = Immutable.fromJS([
@@ -134,6 +143,7 @@ describe "TrelloImportCtrl", ->
 
         loaderObj = {
             start: sinon.spy(),
+            update: sinon.stub(),
             stop: sinon.spy()
         }
 
@@ -144,12 +154,14 @@ describe "TrelloImportCtrl", ->
 
         mocks.confirm.loader.returns(loaderObj)
 
-        mocks.projectUrl.get.withArgs(projectResult).returns('project-url')
+        mocks.importProjectService.importPromise.promise().resolve()
 
         ctrl = $controller("TrelloImportCtrl")
         ctrl.project = Immutable.fromJS({
             id: 1,
-            keepExternalReference: false
+            name: 'project-name',
+            description: 'project-description',
+            keepExternalReference: false,
             is_private: true
         })
 
@@ -159,6 +171,6 @@ describe "TrelloImportCtrl", ->
         ctrl.startImport(users).then () ->
             expect(loaderObj.start).have.been.called
             expect(loaderObj.stop).have.been.called
-            expect(mocks.location.url).have.been.calledWith('project-url')
+            expect(mocks.trelloService.importProject).have.been.calledWith('project-name', 'project-description', 1, users, false, true)
 
             done()

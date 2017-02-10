@@ -18,6 +18,13 @@
 ###
 
 class JiraImportController
+    @.$inject = [
+        'tgJiraImportService',
+        '$tgConfirm',
+        '$translate',
+        'tgImportProjectService',
+    ]
+
     constructor: (@jiraImportService, @confirm, @translate, @importProjectService) ->
         @.step = 'autorization-jira'
         @.project = null
@@ -31,12 +38,13 @@ class JiraImportController
     onSelectProject: (project) ->
         @.step = 'project-form-jira'
         @.project = project
+        @.fetchingUsers = true
+
+        @jiraImportService.fetchUsers(@.project.get('id')).then () => @.fetchingUsers = false
 
     onSaveProjectDetails: (project) ->
         @.project = project
         @.step = 'project-members-jira'
-
-        @jiraImportService.fetchUsers(@.project.get('id'))
 
     startImport: (users) ->
         loader = @confirm.loader(@translate.instant('PROJECT.IMPORT.IN_PROGRESS.TITLE'), @translate.instant('PROJECT.IMPORT.IN_PROGRESS.DESCRIPTION'), true)
@@ -60,14 +68,8 @@ class JiraImportController
 
         @importProjectService.importPromise(promise).then () => loader.stop()
 
-    onSelectUsers: (users) ->
+    submitUserSelection: (users) ->
         @.startImport(users)
-
         return null
 
-angular.module('taigaProjects').controller('JiraImportCtrl', [
-    'tgJiraImportService',
-    '$tgConfirm',
-    '$translate',
-    'tgImportProjectService',
-    JiraImportController])
+angular.module('taigaProjects').controller('JiraImportCtrl', JiraImportController)

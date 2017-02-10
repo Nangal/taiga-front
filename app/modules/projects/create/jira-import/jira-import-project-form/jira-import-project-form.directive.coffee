@@ -19,14 +19,19 @@
 
 JiraImportProjectFormDirective = () ->
     return {
+        link: (scope, elm, attr, ctrl) ->
+            scope.$watch('vm.members', ctrl.checkUsersLimit.bind(ctrl))
+
         templateUrl:"projects/create/jira-import/jira-import-project-form/jira-import-project-form.html",
         controller: "JiraImportProjectFormCtrl",
         controllerAs: "vm",
         bindToController: true,
         scope: {
+            members: '<',
             project: '<',
             onSaveProjectDetails: '&',
-            onCancelForm: '&'
+            onCancelForm: '&',
+            fetchingUsers: '<'
         }
     }
 

@@ -57,7 +57,7 @@ describe "tgTrelloImportService", ->
         _setup()
 
     it "fetch projects", (done) ->
-        service.token = 123
+        service.setToken(123)
         mocks.resources.trelloImporter.listProjects.withArgs(123).promise().resolve('projects')
 
         service.fetchProjects().then () ->
@@ -65,7 +65,7 @@ describe "tgTrelloImportService", ->
             done()
 
     it "fetch user", (done) ->
-        service.token = 123
+        service.setToken(123)
         projectId = 3
         mocks.resources.trelloImporter.listUsers.withArgs(123, projectId).promise().resolve('users')
 
@@ -73,22 +73,16 @@ describe "tgTrelloImportService", ->
             service.projectUsers = 'users'
             done()
 
-    it "import project", (done) ->
-        service.token = 123
+    it "import project", () ->
+        service.setToken(123)
         projectId = 2
 
-        mocks.resources.trelloImporter.importProject.withArgs(123, projectId, true, true, true).promise().resolve({
-            data: {
-                id: 111
-            }
-        })
+        service.importProject(projectId, true, true ,true)
 
-        service.importProject(projectId, true, true ,true).then () ->
-            expect(service.importedProject.get('id')).to.be.equal(111)
-            done()
+        expect(mocks.resources.trelloImporter.importProject).to.have.been.calledWith(123, projectId, true, true, true)
 
     it "get auth url", (done) ->
-        service.token = 123
+        service.setToken(123)
         projectId = 3
 
         response = {
@@ -104,7 +98,7 @@ describe "tgTrelloImportService", ->
             done()
 
     it "authorize", (done) ->
-        service.token = 123
+        service.setToken(123)
         projectId = 3
         verifyCode = 12345
 

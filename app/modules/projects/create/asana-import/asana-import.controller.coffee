@@ -18,6 +18,13 @@
 ###
 
 class AsanaImportController
+    @.$inject = [
+        'tgAsanaImportService',
+        '$tgConfirm',
+        '$translate',
+        'tgImportProjectService',
+    ]
+
     constructor: (@asanaImportService, @confirm, @translate, @importProjectService) ->
         @.step = 'autorization-asana'
         @.project = null
@@ -31,12 +38,13 @@ class AsanaImportController
     onSelectProject: (project) ->
         @.step = 'project-form-asana'
         @.project = project
+        @.fetchingUsers = true
+
+        @asanaImportService.fetchUsers(@.project.get('id')).then () => @.fetchingUsers = false
 
     onSaveProjectDetails: (project) ->
         @.project = project
         @.step = 'project-members-asana'
-
-        @asanaImportService.fetchUsers(@.project.get('id'))
 
     startImport: (users) ->
         loader = @confirm.loader(@translate.instant('PROJECT.IMPORT.IN_PROGRESS.TITLE'), @translate.instant('PROJECT.IMPORT.IN_PROGRESS.DESCRIPTION'), true)
@@ -55,13 +63,8 @@ class AsanaImportController
 
         @importProjectService.importPromise(promise).then () => loader.stop()
 
-    onSelectUsers: (users) ->
+    submitUserSelection: (users) ->
         @.startImport(users)
         return null
 
-angular.module('taigaProjects').controller('AsanaImportCtrl', [
-    'tgAsanaImportService',
-    '$tgConfirm',
-    '$translate',
-    'tgImportProjectService',
-    AsanaImportController])
+angular.module('taigaProjects').controller('AsanaImportCtrl', AsanaImportController)

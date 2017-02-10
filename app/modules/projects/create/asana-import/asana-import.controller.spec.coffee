@@ -22,6 +22,14 @@ describe "AsanaImportCtrl", ->
     $controller = null
     mocks = {}
 
+    _mockCurrentUserService = ->
+        mocks.currentUserService = {
+            canAddMembersPrivateProject: sinon.stub()
+            canAddMembersPublicProject: sinon.stub()
+        }
+
+        $provide.value("tgCurrentUserService", mocks.currentUserService)
+
     _mockAsanaImportService = ->
         mocks.asanaService = {
             fetchProjects: sinon.stub(),
@@ -51,6 +59,7 @@ describe "AsanaImportCtrl", ->
         }
 
         $provide.value("$translate", mocks.translate)
+
     _mocks = ->
         module (_$provide_) ->
             $provide = _$provide_
@@ -59,6 +68,8 @@ describe "AsanaImportCtrl", ->
             _mockConfirm()
             _mockTranslate()
             _mockImportProjectService()
+            _mockCurrentUserService()
+
             return null
 
     _inject = ->
@@ -81,17 +92,25 @@ describe "AsanaImportCtrl", ->
         expect(ctrl.step).to.be.equal('project-select-asana')
         expect(mocks.asanaService.fetchProjects).have.been.called
 
-    it "on select project reload projects", () ->
+    it "on select project reload projects", (done) ->
         project = Immutable.fromJS({
             id: 1,
             name: "project-name"
         })
 
-        ctrl = $controller("AsanaImportCtrl")
-        ctrl.onSelectProject(project)
+        mocks.asanaService.fetchUsers.promise().resolve()
 
-        expect(ctrl.step).to.be.equal('project-form-asana')
-        expect(ctrl.project).to.be.equal(project)
+        ctrl = $controller("AsanaImportCtrl")
+
+        promise = ctrl.onSelectProject(project)
+
+        expect(ctrl.fetchingUsers).to.be.true
+
+        promise.then () ->
+            expect(ctrl.fetchingUsers).to.be.false
+            expect(ctrl.step).to.be.equal('project-form-asana')
+            expect(ctrl.project).to.be.equal(project)
+            done()
 
     it "on save project details reload users", () ->
         project = Immutable.fromJS({
@@ -104,8 +123,6 @@ describe "AsanaImportCtrl", ->
 
         expect(ctrl.step).to.be.equal('project-members-asana')
         expect(ctrl.project).to.be.equal(project)
-
-        expect(mocks.asanaService.fetchUsers).have.been.called
 
     it "on select user init import", (done) ->
         users = Immutable.fromJS([

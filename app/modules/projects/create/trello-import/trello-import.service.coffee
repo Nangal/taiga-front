@@ -25,6 +25,7 @@ class TrelloImportService extends taiga.Service
     constructor: (@resources) ->
         @.projects = Immutable.List()
         @.projectUsers = Immutable.List()
+        @.token = null
 
     setToken: (token) ->
         @.token = token
@@ -36,10 +37,7 @@ class TrelloImportService extends taiga.Service
         @resources.trelloImporter.listUsers(@.token, projectId).then (users) => @.projectUsers = users
 
     importProject: (name, description, projectId, userBindings, keepExternalReference, isPrivate) ->
-        return new Promise (resolve) =>
-            @resources.trelloImporter.importProject(@.token, name, description, projectId, userBindings, keepExternalReference, isPrivate).then (response) =>
-                @.importedProject = Immutable.fromJS(response.data)
-                resolve(@.importedProject)
+        return @resources.trelloImporter.importProject(@.token, name, description, projectId, userBindings, keepExternalReference, isPrivate)
 
     getAuthUrl: () ->
         return new Promise (resolve) =>
