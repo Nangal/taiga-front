@@ -34,7 +34,7 @@ class CreatetProjectFormController
         @.canCreatePublicProjects = @currentUserService.canCreatePublicProjects()
         @.canCreatePrivateProjects = @currentUserService.canCreatePrivateProjects()
 
-        if !@.canCreateProject()
+        if !@.canCreatePublicProjects.valid && @.canCreatePrivateProjects.valid
             @.projectForm.is_private = true
 
         if @.type == 'scrum'

@@ -46,9 +46,11 @@ class TrelloImportService extends taiga.Service
                 resolve(@.authUrl)
 
     authorize: (verifyCode) ->
-        return new Promise (resolve) =>
-            @resources.trelloImporter.authorize(verifyCode).then (response) =>
+        return new Promise (resolve, reject) =>
+            @resources.trelloImporter.authorize(verifyCode).then ((response) =>
                 @.token = response.data.token
                 resolve(@.token)
+            ), (error) ->
+                reject(new Error(error.status))
 
 angular.module("taigaProjects").service("tgTrelloImportService", TrelloImportService)

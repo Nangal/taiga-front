@@ -47,9 +47,11 @@ class AsanaImportService extends taiga.Service
                 resolve(@.authUrl)
 
     authorize: (code) ->
-        return new Promise (resolve) =>
-            @resources.asanaImporter.authorize(code).then (response) =>
+        return new Promise (resolve, reject) =>
+            @resources.asanaImporter.authorize(code).then ((response) =>
                 @.token = response.data.token
                 resolve(@.token)
+            ), (error) ->
+                reject(new Error(error.status))
 
 angular.module("taigaProjects").service("tgAsanaImportService", AsanaImportService)

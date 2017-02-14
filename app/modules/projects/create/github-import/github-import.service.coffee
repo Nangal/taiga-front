@@ -45,9 +45,11 @@ class GithubImportService extends taiga.Service
                 resolve(@.authUrl)
 
     authorize: (code) ->
-        return new Promise (resolve) =>
-            @resources.githubImporter.authorize(code).then (response) =>
+        return new Promise (resolve, reject) =>
+            @resources.githubImporter.authorize(code).then ((response) =>
                 @.token = response.data.token
                 resolve(@.token)
+            ), (error) ->
+                reject(new Error(error.status))
 
 angular.module("taigaProjects").service("tgGithubImportService", GithubImportService)

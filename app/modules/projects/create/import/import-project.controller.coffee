@@ -43,7 +43,9 @@ class ImportProjectController
             if locationSearch.code
                 asanaOauthToken = locationSearch.code
 
-                return @asanaService.authorize(asanaOauthToken).then (token) => @location.search({token: encodeURIComponent(JSON.stringify(token))})
+                return @asanaService.authorize(asanaOauthToken).then ((token) =>
+                    @location.search({token: encodeURIComponent(JSON.stringify(token))})
+                ), @.cancelCurrentImport.bind(this)
             else
                 @.token = JSON.parse(decodeURIComponent(locationSearch.token))
                 @asanaService.setToken(@.token)
@@ -51,7 +53,9 @@ class ImportProjectController
         if @.from  == 'trello'
             if locationSearch.oauth_verifier
                 trelloOauthToken = locationSearch.oauth_verifier
-                return @trelloService.authorize(trelloOauthToken).then (token) => @location.search({token: token})
+                return @trelloService.authorize(trelloOauthToken).then ((token) =>
+                    @location.search({token: token})
+                ), @.cancelCurrentImport.bind(this)
             else if locationSearch.token
                 @.token = locationSearch.token
                 @trelloService.setToken(locationSearch.token)
@@ -59,7 +63,10 @@ class ImportProjectController
         if @.from == "github"
             if locationSearch.code
                 githubOauthToken = locationSearch.code
-                return @githubService.authorize(githubOauthToken).then (token) => @location.search({token: token})
+
+                return @githubService.authorize(githubOauthToken).then ((token) =>
+                    @location.search({token: token})
+                ), @.cancelCurrentImport.bind(this)
             else if locationSearch.token
                 @.token = locationSearch.token
                 @githubService.setToken(locationSearch.token)
@@ -68,8 +75,9 @@ class ImportProjectController
             jiraOauthToken = locationSearch.oauth_token
 
             if jiraOauthToken
-                return @jiraService.authorize().then (data) =>
+                return @jiraService.authorize().then ((data) =>
                     @location.search({token: data.token, url: data.url})
+                ), @.cancelCurrentImport.bind(this)
             else
                 @.token = locationSearch.token
                 @jiraService.setToken(locationSearch.token, locationSearch.url)

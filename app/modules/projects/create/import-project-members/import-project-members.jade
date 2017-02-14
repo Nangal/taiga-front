@@ -59,9 +59,11 @@
     )
 
     tg-select-import-user-lightbox.lightbox(
+       is-private="vm.project.get('is_private')"
+       limit-members-private-project="vm.limitMembersPrivateProject"
+       limit-members-public-project="vm.limitMembersPublicProject"
        visible="vm.selectImportUserLightbox"
        user="vm.searchingUser"
-       max-members="vm.project.get('is_private') ? vm.limitMembersPrivateProject.max : vm.limitMembersPublicProject.max"
        selectable-users="vm.selectableUsers"
        on-close="vm.selectImportUserLightbox = false"
        on-select-user="vm.confirmUser(user, taigaUser)"

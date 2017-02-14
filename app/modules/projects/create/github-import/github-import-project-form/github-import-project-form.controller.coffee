@@ -33,7 +33,7 @@ class GithubImportProjectFormController
         @.projectForm.keepExternalReference = false
         @.projectForm.project_type = "kanban"
 
-        if !@.canCreateProject()
+        if !@.canCreatePublicProjects.valid && @.canCreatePrivateProjects.valid
             @.projectForm.is_private = true
 
     checkUsersLimit: () ->

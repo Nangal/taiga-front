@@ -38,7 +38,7 @@ class DuplicateProjectController
             is_private: false
         }
 
-        if !@.canCreateProject()
+        if !@.canCreatePublicProjects.valid && @.canCreatePrivateProjects.valid
             @.projectForm.is_private = true
 
     refreshReferenceProject: (slug) ->
@@ -57,8 +57,8 @@ class DuplicateProjectController
         @.checkUsersLimit()
 
     checkUsersLimit: () ->
-        @.limitMembersPrivateProject = @currentUserService.canAddMembersPrivateProject(@.invitedMembers.size)
-        @.limitMembersPublicProject = @currentUserService.canAddMembersPublicProject(@.invitedMembers.size)
+        @.limitMembersPrivateProject = @currentUserService.canAddMembersPrivateProject(@.invitedMembers.size + 1)
+        @.limitMembersPublicProject = @currentUserService.canAddMembersPublicProject(@.invitedMembers.size + 1)
 
     submit: () ->
         projectId = @.referenceProject.get('id')
@@ -72,12 +72,12 @@ class DuplicateProjectController
 
     canCreateProject: () ->
         if @.projectForm.is_private
-            return @.canCreatePrivateProjects.valid
+            return @.canCreatePrivateProjects.valid && @.limitMembersPrivateProject.valid
         else
-            return @.canCreatePublicProjects.valid
+            return @.canCreatePublicProjects.valid && @.limitMembersPublicProject.valid
 
     isDisabled: () ->
-        return @.formSubmitLoading || !@.canCreateProject() || @.limitMembersPrivateProject || @.limitMembersPublicProject
+        return @.formSubmitLoading || !@.canCreateProject()
 
     onCancelForm: () ->
         @location.path(@navUrls.resolve("create-project"))

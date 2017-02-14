@@ -36,7 +36,7 @@ class JiraImportProjectFormController
             @.projectForm.project_type = "scrum"
         @.projectForm.create_subissues = true
 
-        if !@.canCreateProject()
+        if !@.canCreatePublicProjects.valid && @.canCreatePrivateProjects.valid
             @.projectForm.is_private = true
 
     checkUsersLimit: () ->

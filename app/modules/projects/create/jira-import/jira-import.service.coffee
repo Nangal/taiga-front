@@ -47,10 +47,12 @@ class JiraImportService extends taiga.Service
                 resolve(@.authUrl)
 
     authorize: () ->
-        return new Promise (resolve) =>
-            @resources.jiraImporter.authorize().then (response) =>
+        return new Promise (resolve, reject) =>
+            @resources.jiraImporter.authorize().then ((response) =>
                 @.token = response.data.token
                 @.url = response.data.url
                 resolve(response.data)
+            ), (error) ->
+                reject(new Error(error.status))
 
 angular.module("taigaProjects").service("tgJiraImportService", JiraImportService)

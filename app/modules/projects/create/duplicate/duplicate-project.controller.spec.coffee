@@ -129,8 +129,8 @@ describe "DuplicateProjectController", ->
             expect(ctrl.invitedMembers.toJS()).to.be.eql([1, 2, 3])
 
     it 'check users limits', () ->
-        mocks.currentUserService.canAddMembersPrivateProject.withArgs(3).returns(1)
-        mocks.currentUserService.canAddMembersPublicProject.withArgs(3).returns(2)
+        mocks.currentUserService.canAddMembersPrivateProject.withArgs(4).returns(1)
+        mocks.currentUserService.canAddMembersPublicProject.withArgs(4).returns(2)
 
         members = Immutable.fromJS([
             {id: 1},

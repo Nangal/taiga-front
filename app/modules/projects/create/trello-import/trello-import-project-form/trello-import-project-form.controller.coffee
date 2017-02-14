@@ -32,7 +32,7 @@ class TrelloImportProjectFormController
         @.projectForm.is_private = false
         @.projectForm.keepExternalReference = false
 
-        if !@.canCreateProject()
+        if !@.canCreatePublicProjects.valid && @.canCreatePrivateProjects.valid
             @.projectForm.is_private = true
 
     checkUsersLimit: () ->
