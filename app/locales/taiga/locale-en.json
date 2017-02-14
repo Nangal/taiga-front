@@ -972,7 +972,6 @@
         },
         "IMPORT": {
             "TITLE": "Import Project",
-            "DESCRIPTION": "Import from Taiga, Trello, Jira, Github...",
             "IMPORT": "Import",
             "ARCHIVED": "Archived",
             "ARCHIVED_DESCRIPTION": "You have archived projects, Do you want to import your archived projects?",

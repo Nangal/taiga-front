@@ -6,7 +6,7 @@
             tg-click-input-file,
             tg-import-taiga
         )
-        li.import-project-from-site(ng-click="vm.unfoldOptions('jira')")
+        li.import-project-from-site(ng-click="vm.unfoldOptions('jira')", ng-if="vm.isActiveImporter('jira')")
             .import-project-logo
                 img(
                     src="/#{v}/images/import-logos/jira.png"
@@ -33,7 +33,7 @@
                         title="{{'PROJECT.IMPORT.ACCEEDE' | translate}}"
                         translate="PROJECT.IMPORT.ACCEEDE"
                     )
-        li.import-project-from-site(ng-click="vm.select('github')")
+        li.import-project-from-site(ng-click="vm.select('github')", ng-if="vm.isActiveImporter('github')")
             .import-project-logo
                 img(
                     src="/#{v}/images/import-logos/github.png"
@@ -45,7 +45,7 @@
                     title="Github"
                 ) Github
                 p.import-project-description(translate="PROJECT.IMPORT.GITHUB.SELECTOR")
-        li.import-project-from-site(ng-click="vm.select('trello')")
+        li.import-project-from-site(ng-click="vm.select('trello')", ng-if="vm.isActiveImporter('trello')")
             .import-project-logo
                 img(
                     src="/#{v}/images/import-logos/trello.png"
@@ -57,7 +57,7 @@
                     title="Trello"
                 ) Trello
                 p.import-project-description(translate="PROJECT.IMPORT.TRELLO.SELECTOR")
-        li.import-project-from-site(ng-click="vm.select('asana')")
+        li.import-project-from-site(ng-click="vm.select('asana')", ng-if="vm.isActiveImporter('asana')")
             .import-project-logo
                 img(
                     src="/#{v}/images/import-logos/asana.png"

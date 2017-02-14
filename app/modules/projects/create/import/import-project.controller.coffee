@@ -27,9 +27,10 @@ class ImportProjectController
         '$window',
         '$routeParams',
         '$tgNavUrls',
+        '$tgConfig',
     ]
 
-    constructor: (@trelloService, @jiraService, @githubService, @asanaService, @location, @window, @routeParams, @tgNavUrls) ->
+    constructor: (@trelloService, @jiraService, @githubService, @asanaService, @location, @window, @routeParams, @tgNavUrls, @config) ->
 
     start: ->
         @.token = null
@@ -92,6 +93,11 @@ class ImportProjectController
 
     unfoldOptions: (options) ->
         @.unfoldedOptions = options
+
+    isActiveImporter: (importer) ->
+        if @config.get('importers').indexOf(importer) == -1
+            return false
+        return true
 
     cancelCurrentImport: () ->
         @location.url(@tgNavUrls.resolve('create-project-import'))
