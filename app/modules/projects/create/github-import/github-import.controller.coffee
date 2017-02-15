@@ -47,6 +47,9 @@ class GithubImportController
         @.project = project
         @.step = 'project-members-github'
 
+    onCancelMemberSelection: () ->
+        @.step = 'project-form-github'
+
     startImport: (users) ->
         loader = @confirm.loader(@translate.instant('PROJECT.IMPORT.IN_PROGRESS.TITLE'), @translate.instant('PROJECT.IMPORT.IN_PROGRESS.DESCRIPTION'), true)
 

@@ -46,6 +46,9 @@ class JiraImportController
         @.project = project
         @.step = 'project-members-jira'
 
+    onCancelMemberSelection: () ->
+        @.step = 'project-form-jira'        
+
     startImport: (users) ->
         loader = @confirm.loader(@translate.instant('PROJECT.IMPORT.IN_PROGRESS.TITLE'), @translate.instant('PROJECT.IMPORT.IN_PROGRESS.DESCRIPTION'), true)
 

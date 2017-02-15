@@ -3,7 +3,7 @@ tg-lightbox-close(on-close="vm.onClose()")
 .form(ng-if="vm.visible")
     h2.title(translate="PROJECT.IMPORT.WHO_IS")
 
-    p.candidate-user {{vm.user.get('full_name')}}
+    p.candidate-user {{vm.user.get('full_name') || vm.user.get('username')}}
 
     div.create-project-warning(ng-if="!vm.limitMembersPublicProject.valid && !vm.isPrivate")
         tg-svg(svg-icon="icon-exclamation")
@@ -19,10 +19,12 @@ tg-lightbox-close(on-close="vm.onClose()")
             translate-values="{'members': vm.limitMembersPrivateProject.max}"
         )
 
-    form(ng-if="vm.mode == 'mail'", ng-submit="vm.searchUser()")
+    form(ng-if="vm.mode == 'mail'", ng-submit="vm.assignUser()")
+        div.create-project-warning
+            tg-svg(svg-icon="icon-exclamation")
+            span(translate="PROJECT.IMPORT.WARNING_MAIL_USER")
+            
         fieldset
-            p.error(ng-if="vm.invalid", translate="PROJECT.IMPORT.EMAIL_NOT_FOUND")
-
             label(
                 translate="PROJECT.IMPORT.WRITE_EMAIL_LABEL"
                 for="user-name"
@@ -37,8 +39,8 @@ tg-lightbox-close(on-close="vm.onClose()")
                 )
                 button.button-green.submit-button(
                     type="submit",
-                    title="{{'LIGHTBOX.SEARCH.TITLE' | translate}}",
-                    translate="LIGHTBOX.SEARCH.TITLE"
+                    title="{{'PROJECT.IMPORT.ASSIGN' | translate}}",
+                    translate="PROJECT.IMPORT.ASSIGN"
                 )
 
         .search-user-mode

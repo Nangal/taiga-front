@@ -52,7 +52,6 @@ class ImportProjectMembersController
         @.selectImportUserLightbox = false
 
         user = Immutable.Map()
-
         user = user.set('user', externalUser)
         user = user.set('taigaUser', taigaUser)
 
@@ -89,13 +88,22 @@ class ImportProjectMembersController
         @.warningImportUsers = false
 
         users = Immutable.Map()
-        @.selectedUsers.map (it) -> users = users.set(it.getIn(['user', 'id']), it.getIn(['taigaUser', 'id']))
+
+        @.selectedUsers.map (it) ->
+            id = ''
+
+            if _.isString(it.get('taigaUser'))
+                id = it.get('taigaUser')
+            else
+                id = it.getIn(['taigaUser', 'id'])
+
+            users = users.set(it.getIn(['user', 'id']), id)
 
         @.onSubmit({users: users})
 
     checkUsersLimit: () ->
-        @.limitMembersPrivateProject = @currentUserService.canAddMembersPrivateProject(@.members.size)
-        @.limitMembersPublicProject = @currentUserService.canAddMembersPublicProject(@.members.size)
+        @.limitMembersPrivateProject = @currentUserService.canAddMembersPrivateProject(@.members.size + 1)
+        @.limitMembersPublicProject = @currentUserService.canAddMembersPublicProject(@.members.size + 1)
 
     showSuggestedMatch: (member) ->
         return member.get('user') && @.cancelledUsers.indexOf(member.get('id')) == -1 && !@.isMemberSelected(member)
@@ -103,7 +111,7 @@ class ImportProjectMembersController
     getDistinctSelectedTaigaUsers: () ->
         ids = []
 
-        return @.selectedUsers.filter (it) ->
+        users = @.selectedUsers.filter (it) ->
             id = it.getIn(['taigaUser', 'id'])
 
             if ids.indexOf(id) == -1
@@ -112,23 +120,30 @@ class ImportProjectMembersController
 
             return false
 
-    refreshSelectableUsers: () ->
-        importMoreUsersDisabled = @.isImportMoreUsersDisabled()
+        return users.filter (it) =>
+            return it.getIn(['taigaUser', 'id']) != @.currentUser.get('id')
 
-        if importMoreUsersDisabled
+    refreshSelectableUsers: () ->
+        @.importMoreUsersDisabled = @.isImportMoreUsersDisabled()
+
+        if @.importMoreUsersDisabled
             users = @.getDistinctSelectedTaigaUsers()
 
             @.selectableUsers = users.map (it) -> return it.get('taigaUser')
         else
-            @.selectableUsers = @.userContacts.push(@.currentUser)
+            @.selectableUsers = @.userContacts
+
+        @.selectableUsers = @.selectableUsers.push(@.currentUser)
 
     isImportMoreUsersDisabled: () ->
         users = @.getDistinctSelectedTaigaUsers()
 
-        if @.project.get('is_private')
-            return !@currentUserService.canAddMembersPrivateProject(users.size + 1).valid
-        else
-            return !@currentUserService.canAddMembersPublicProject(users.size + 1).valid
+        # currentUser + newUser = +2
+        total = users.size + 2
 
+        if @.project.get('is_private')
+            return !@currentUserService.canAddMembersPrivateProject(total).valid
+        else
+            return !@currentUserService.canAddMembersPublicProject(total).valid
 
 angular.module('taigaProjects').controller('ImportProjectMembersCtrl', ImportProjectMembersController)

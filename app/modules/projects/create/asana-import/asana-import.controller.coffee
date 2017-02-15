@@ -46,6 +46,9 @@ class AsanaImportController
         @.project = project
         @.step = 'project-members-asana'
 
+    onCancelMemberSelection: () ->
+        @.step = 'project-form-asana'        
+
     startImport: (users) ->
         loader = @confirm.loader(@translate.instant('PROJECT.IMPORT.IN_PROGRESS.TITLE'), @translate.instant('PROJECT.IMPORT.IN_PROGRESS.DESCRIPTION'), true)
 

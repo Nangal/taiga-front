@@ -26,7 +26,7 @@
         li.import-project-members-row(tg-repeat="member in vm.members track by member.get('id')")
             .import-project-members-single
                 .avatar.empty {{member.get('full_name')[0].toUpperCase()}}
-                span.import-project-members-username {{member.get('full_name')}}
+                span.import-project-members-username {{member.get('full_name') || member.get('username') }}
 
             .import-project-members-actions
                 .import-project-members-match(ng-if="vm.showSuggestedMatch(member)")
@@ -42,7 +42,7 @@
                 .import-project-members-selected(ng-if="vm.getUser(member) && !vm.showSuggestedMatch(member)")
                     button.import-project-members-delete(ng-click="vm.unselectUser(member)")
                         tg-svg(svg-icon="icon-close")
-                    span {{vm.getUser(member).get('full_name')}}
+                    span {{vm.getUser(member).get('full_name') || vm.getUser(member)}}
                     span.import-project-members-selected-img
                         img(tg-avatar="vm.getUser(member)")
 
@@ -52,11 +52,18 @@
                     translate="PROJECT.IMPORT.CHOOSE"
                 )
 
-    button.button.button-green.import-project-members-submit(
-        ng-if="vm.members.size > 0"
-        ng-click="vm.beforeSubmitUsers()"
-        translate="PROJECT.IMPORT.IMPORT"
-    )
+    .create-project-action
+        button.trans-button.create-project-action-cancel(
+            type="button"
+            ng-click="vm.onCancel()"
+            title="{{'PROJECT.CREATE.BACK' | translate}}"
+            translate="PROJECT.CREATE.BACK"
+        )
+        button.button.button-green.create-project-action-submit(
+            ng-if="vm.members.size > 0"
+            ng-click="vm.beforeSubmitUsers()"
+            translate="PROJECT.IMPORT.IMPORT"
+        )
 
     tg-select-import-user-lightbox.lightbox(
        is-private="vm.project.get('is_private')"

@@ -33,7 +33,8 @@ ImportProjectMembersDirective = () ->
             project: '<',
             onSubmit: '&',
             platform: '@',
-            logo: '@'
+            logo: '@',
+            onCancel: '&'
         }
     }
 

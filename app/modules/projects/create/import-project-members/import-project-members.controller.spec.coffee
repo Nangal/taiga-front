@@ -210,6 +210,14 @@ describe "ImportProjectMembersCtrl", ->
             }
         }))
 
+        ctrl.selectedUsers = ctrl.selectedUsers.push(Immutable.fromJS({
+            user: {
+                id: 3
+            },
+            taigaUser: "xx@yy.com"
+        }))
+
+
         ctrl.onSubmit = sinon.stub()
 
         ctrl.submit()
@@ -270,7 +278,7 @@ describe "ImportProjectMembersCtrl", ->
         expect(ctrl.limitMembersPublicProject).to.be.equal('yy')
 
 
-     it "get distict select taiga users", () ->
+     it "get distict select taiga users excluding the current user", () ->
         ctrl = $controller("ImportProjectMembersCtrl")
         ctrl.selectedUsers = Immutable.fromJS([
             {
@@ -287,10 +295,19 @@ describe "ImportProjectMembersCtrl", ->
                 taigaUser: {
                     id: 3
                 }
+            },
+            {
+                taigaUser: {
+                    id: 5
+                }
             }
         ])
 
         users = ctrl.getDistinctSelectedTaigaUsers()
+
+        ctrl.currentUser = Immutable.fromJS({
+            id: 5
+        })
 
         expect(users.size).to.be.equal(2)
 

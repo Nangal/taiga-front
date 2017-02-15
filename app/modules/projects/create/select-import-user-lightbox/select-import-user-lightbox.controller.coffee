@@ -26,8 +26,8 @@ class SelectImportUserLightboxCtrl
         @.mode = 'search'
         @.invalid = false
 
-    searchUser: () ->
-        @.invalid = true
+    assignUser: () ->
+        @.onSelectUser({user: @.user, taigaUser: @.userEmail})
 
     selectUser: (taigaUser) ->
         @.onSelectUser({user: @.user, taigaUser: Immutable.fromJS(taigaUser)})

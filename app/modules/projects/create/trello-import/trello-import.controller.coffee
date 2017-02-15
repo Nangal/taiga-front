@@ -44,6 +44,9 @@ class TrelloImportController
         @.project = project
         @.step = 'project-members-trello'
 
+    onCancelMemberSelection: () ->
+        @.step = 'project-form-trello'
+
     startImport: (users) ->
         loader = @confirm.loader(@translate.instant('PROJECT.IMPORT.IN_PROGRESS.TITLE'), @translate.instant('PROJECT.IMPORT.IN_PROGRESS.DESCRIPTION'), true)
 
