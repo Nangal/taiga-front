@@ -25,7 +25,9 @@
     ul(ng-if="vm.members.size")
         li.import-project-members-row(tg-repeat="member in vm.members track by member.get('id')")
             .import-project-members-single
-                .avatar.empty {{member.get('full_name')[0].toUpperCase()}}
+                .avatar.empty(ng-if="!member.get('avatar')") {{member.get('full_name')[0].toUpperCase()}}
+                .avatar(ng-if="member.get('avatar')") 
+                    img(ng-src="{{member.get('avatar')}}")
                 span.import-project-members-username {{member.get('full_name') || member.get('username') }}
 
             .import-project-members-actions

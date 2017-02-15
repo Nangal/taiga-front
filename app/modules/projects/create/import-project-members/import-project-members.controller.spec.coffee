@@ -269,8 +269,8 @@ describe "ImportProjectMembersCtrl", ->
             1, 2, 3
         ])
 
-        mocks.currentUserService.canAddMembersPrivateProject.withArgs(3).returns('xx')
-        mocks.currentUserService.canAddMembersPublicProject.withArgs(3).returns('yy')
+        mocks.currentUserService.canAddMembersPrivateProject.withArgs(4).returns('xx')
+        mocks.currentUserService.canAddMembersPublicProject.withArgs(4).returns('yy')
 
         ctrl.checkUsersLimit()
 
@@ -303,11 +303,11 @@ describe "ImportProjectMembersCtrl", ->
             }
         ])
 
-        users = ctrl.getDistinctSelectedTaigaUsers()
-
         ctrl.currentUser = Immutable.fromJS({
             id: 5
         })
+
+        users = ctrl.getDistinctSelectedTaigaUsers()
 
         expect(users.size).to.be.equal(2)
 
@@ -328,8 +328,7 @@ describe "ImportProjectMembersCtrl", ->
         ctrl = $controller("ImportProjectMembersCtrl")
 
         ctrl.getDistinctSelectedTaigaUsers = sinon.stub().returns(Immutable.fromJS([
-            {taigaUser: 1},
-            {taigaUser: 2}
+            {taigaUser: 1}
         ]))
 
         ctrl.isImportMoreUsersDisabled = sinon.stub().returns(true)
@@ -350,7 +349,7 @@ describe "ImportProjectMembersCtrl", ->
 
         ctrl.getDistinctSelectedTaigaUsers = sinon.stub().returns(Immutable.fromJS([1,2,3]))
 
-        mocks.currentUserService.canAddMembersPrivateProject.withArgs(4).returns({valid: true})
+        mocks.currentUserService.canAddMembersPrivateProject.withArgs(5).returns({valid: true})
 
         expect(ctrl.isImportMoreUsersDisabled()).to.be.false
 
@@ -363,6 +362,6 @@ describe "ImportProjectMembersCtrl", ->
 
         ctrl.getDistinctSelectedTaigaUsers = sinon.stub().returns(Immutable.fromJS([1,2,3]))
 
-        mocks.currentUserService.canAddMembersPublicProject.withArgs(4).returns({valid: true})
+        mocks.currentUserService.canAddMembersPublicProject.withArgs(5).returns({valid: true})
 
         expect(ctrl.isImportMoreUsersDisabled()).to.be.false

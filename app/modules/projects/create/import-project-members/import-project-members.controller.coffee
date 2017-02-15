@@ -141,6 +141,7 @@ class ImportProjectMembersController
         # currentUser + newUser = +2
         total = users.size + 2
 
+
         if @.project.get('is_private')
             return !@currentUserService.canAddMembersPrivateProject(total).valid
         else

@@ -975,7 +975,7 @@
             "IMPORT": "Import",
             "ARCHIVED": "Archived",
             "ARCHIVED_DESCRIPTION": "You have archived projects, Do you want to import your archived projects?",
-            "WHO_IS": "Who is in Taiga?",
+            "WHO_IS": "Their tasks will be assigned to ...",
             "WRITE_EMAIL": "Or if you want, write the email that their use in Taiga",
             "SEARCH_CONTACT": "Or if you want, search in your contacts",
             "WRITE_EMAIL_LABEL": "Write the email that their use in Taiga",

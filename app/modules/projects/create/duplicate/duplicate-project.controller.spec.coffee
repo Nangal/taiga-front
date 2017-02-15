@@ -181,6 +181,7 @@ describe "DuplicateProjectController", ->
         mocks.currentUserService.canCreatePrivateProjects = sinon.stub().returns({valid: true})
 
         ctrl = controller "DuplicateProjectCtrl"
+        ctrl.limitMembersPrivateProject = {valid: true}
 
         ctrl.projectForm = {
             is_private: true
@@ -202,6 +203,7 @@ describe "DuplicateProjectController", ->
         mocks.currentUserService.canCreatePublicProjects = sinon.stub().returns({valid: true})
 
         ctrl = controller "DuplicateProjectCtrl"
+        ctrl.limitMembersPublicProject = {valid: true}
 
         ctrl.projectForm = {
             is_private: false

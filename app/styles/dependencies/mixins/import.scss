@@ -1,7 +1,6 @@
 @mixin import-project-selector {
      @include centered;
     max-width: 800px;
-
     .import-project-selector {
 
         &-service {
@@ -46,6 +45,9 @@
 @mixin import-members {
     @include centered;
     max-width: 800px;
+    .avatar {
+        width: 48px;
+    }    
     &-title {
         @include font-size(normal);
         @include font-type(bold);

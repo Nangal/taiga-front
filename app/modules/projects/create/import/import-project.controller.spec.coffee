@@ -22,6 +22,13 @@ describe "ImportProjectCtrl", ->
     $controller = null
     mocks = {}
 
+    _mockConfig = ->
+        mocks.config = Immutable.fromJS({
+            importers: ['trello', 'github', 'jira', 'asana']
+        })
+
+        $provide.value("$tgConfig", mocks.config)
+
     _mockTrelloImportService = ->
         mocks.trelloService = {
             authorize: sinon.stub(),
@@ -94,6 +101,7 @@ describe "ImportProjectCtrl", ->
             _mockLocation()
             _mockTgNavUrls()
             _mockRouteParams()
+            _mockConfig()
 
             return null
 
